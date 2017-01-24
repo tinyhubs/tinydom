@@ -10,15 +10,15 @@ tinydom借鉴了[tinyxml2](http://www.grinninglizard.com/tinyxml2/index.html)的
 
 # 接口设计
 一个XML文档由`XMLDocument`、`XMLElement`、`XMLText`、`XMLComment`、`XMLProcInst`、`XMLDirective`者几种类型的节点组成。
-`XMLDocument`是一个XML文档的根节点。
-`XMLElement`是XML文档的基本节点元素，一个XMLElement可以含有多个XMLAttribute。
-`XMLText`是XML的文本元素，支持CDATA和XML字符转义。
-`XMLComment`表示的是XML的注释，是`<!--` 与 `-->`之间的部分。
-`XMLProcInst`表示的是`<?`与`?>`之间的部分，一般出现在xml文档的声明部分。
-`XMLDirective`表示的是`<!`与`>`之间的部分，一般为DTD。
-`XNLNode`是所有这些节点的共同基础，XMLNode提供了丰富的节点元素遍历手段。
-`XMLVisitor`提供了一种XML对象的元素遍历机制。
-`XMLHandle`的所用是简化代码编写工作，使用XMLHandle将减少很多判空代码(if nil == xxx {}),活用XMLHandle将会让XML文件的元素事半功倍。
+- `XMLDocument`是一个XML文档的根节点。
+- `XMLElement`是XML文档的基本节点元素，一个XMLElement可以含有多个XMLAttribute。
+- `XMLText`是XML的文本元素，支持CDATA和XML字符转义。
+- `XMLComment`表示的是XML的注释，是`<!--` 与 `-->`之间的部分。
+- `XMLProcInst`表示的是`<?`与`?>`之间的部分，一般出现在xml文档的声明部分。
+- `XMLDirective`表示的是`<!`与`>`之间的部分，一般为DTD。
+- `XNLNode`是所有这些节点的共同基础，XMLNode提供了丰富的节点元素遍历手段。
+- `XMLVisitor`提供了一种XML对象的元素遍历机制。
+- `XMLHandle`的所用是简化代码编写工作，使用XMLHandle将减少很多判空代码(if nil == xxx {}),活用XMLHandle将会让XML文件的元素事半功倍。
 
 # 如何使用
 ##  加载文档
