@@ -5,7 +5,7 @@ go语言的xml流的dom解析器。
 # tinydom简介
 tinydom	实现了一个简单的XML的DOM模型.
 
-tidydom使用encoding/xml作为底层XML解析库，实现对XML文件的解析.使用tinydom提供的接口可以实现简单的XML文件的读取和生成。
+tidydom使用golang的encoding/xml标准库作为底层XML解析器，实现对XML文件的解析。使用tinydom提供的接口可以实现简单的XML文件的读取和生成。
 tinydom借鉴了[tinyxml2](http://www.grinninglizard.com/tinyxml2/index.html)的接口设计技巧，提供了丰富的查找XML元素的查找手段。
 
 # 接口设计
