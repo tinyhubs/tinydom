@@ -10,6 +10,7 @@ tinydom借鉴了[tinyxml2](http://www.grinninglizard.com/tinyxml2/index.html)的
 
 # 接口设计
 一个XML文档由`XMLDocument`、`XMLElement`、`XMLText`、`XMLComment`、`XMLProcInst`、`XMLDirective`者几种类型的节点组成。
+
 - `XMLDocument`是一个XML文档的根节点。
 - `XMLElement`是XML文档的基本节点元素，一个XMLElement可以含有多个XMLAttribute。
 - `XMLText`是XML的文本元素，支持CDATA和XML字符转义。
