@@ -1,14 +1,21 @@
 # tinydom
 
-go语言的微型xml dom解析器
+go语言的xml流的dom解析器。
 
 # tinydom简介
-Package tinydom	实现了一个简单的XML的DOM模型.
-tidydom使用encoding/xml作为底层XML解析库，实现对XML文件的解析.使用tinydom提供的接口可以实现简单的XML文件的读取和生成。
-tinydom借鉴了[tinyxml2](http://www.grinninglizard.com/tinyxml2/index.html)的接口设计技巧，tinydom的接口和tinyxml类似，都提供了丰富的查找XML元素的查找手段。
+tinydom	实现了一个简单的XML的DOM模型.
 
-# tinydom的接口设计
-一个XML文档由`XMLElement`、`XMLText`、`XMLComment`、`XMLDocument`、`XMLProcInst`、`XMLDirective`者几种类型的节点组成。
+tidydom使用encoding/xml作为底层XML解析库，实现对XML文件的解析.使用tinydom提供的接口可以实现简单的XML文件的读取和生成。
+tinydom借鉴了[tinyxml2](http://www.grinninglizard.com/tinyxml2/index.html)的接口设计技巧，提供了丰富的查找XML元素的查找手段。
+
+# 接口设计
+一个XML文档由`XMLDocument`、`XMLElement`、`XMLText`、`XMLComment`、`XMLProcInst`、`XMLDirective`者几种类型的节点组成。
+`XMLDocument`是一个XML文档的根节点。
+`XMLElement`是XML文档的基本节点元素，一个XMLElement可以含有多个XMLAttribute。
+`XMLText`是XML的文本元素，支持CDATA和XML字符转义。
+`XMLComment`表示的是XML的注释，是`<!--` 与 `-->`之间的部分。
+`XMLProcInst`表示的是`<?`与`?>`之间的部分，一般出现在xml文档的声明部分。
+`XMLDirective`表示的是`<!`与`>`之间的部分，一般为DTD。
 `XNLNode`是所有这些节点的共同基础，XMLNode提供了丰富的节点元素遍历手段。
 `XMLVisitor`提供了一种XML对象的元素遍历机制。
 `XMLHandle`的所用是简化代码编写工作，使用XMLHandle将减少很多判空代码(if nil == xxx {}),活用XMLHandle将会让XML文件的元素事半功倍。
@@ -57,11 +64,7 @@ InsertEndChild、InsertFirstChild、InsertAfterChild、DeleteChildren、DeleteCh
 
 ##  文档的遍历
 `Parent`、`FirstChild`、`LastChild`、`PreviousSibling`、`NextSibling`用于使我们可以方便地在XML的DOM树中游走。
-下面这个函数可以用于对一个doc进行遍历，可以这样使用:
-```go
-walk(doc)。
-```
-还有一个更好的替代方式是使用XMLVisitor接口对文档中的元素进行遍历。
+下面这个函数可以用于对一个doc进行遍历：
 ```go
     func walk(m int , rootNode tinydom.XMLNode) {
         if nil == rootNode {
@@ -73,6 +76,11 @@ walk(doc)。
         }
     }
 ```
+您可以这样调用：
+```go
+walk(doc)。
+```
+还有一个更好的替代方式是使用XMLVisitor接口对文档中的元素进行遍历，可参见代码中XMLHandle的接口定义。
 
 ##  XML字符转义
 受益于go的xml库，tinydom也支持XML字符转义，使用tinydom在读写xml的数据的时候不需要关注XML转义字符，tinydom自动会处理好，可参考下面的例子。
