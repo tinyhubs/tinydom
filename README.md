@@ -3,12 +3,15 @@
 go语言的xml流的dom解析器。
 
 # tinydom简介
-tinydom	实现了一个简单的XML的DOM模型.
+tinydom	实现了一个简单的非验证的XML的DOM构造器.
 
 tidydom使用golang的encoding/xml标准库作为底层XML解析器，实现对XML文件的解析。使用tinydom提供的接口可以实现简单的XML文件的读取和生成。
 tinydom借鉴了[tinyxml2](http://www.grinninglizard.com/tinyxml2/index.html)的接口设计技巧，提供了丰富的查找XML元素的查找手段。
 
-# 接口设计
+
+
+# 如何使用
+# 接口定义
 一个XML文档由`XMLDocument`、`XMLElement`、`XMLText`、`XMLComment`、`XMLProcInst`、`XMLDirective`者几种类型的节点组成。
 
 - `XMLDocument`是一个XML文档的根节点。
@@ -21,7 +24,6 @@ tinydom借鉴了[tinyxml2](http://www.grinninglizard.com/tinyxml2/index.html)的
 - `XMLVisitor`提供了一种XML对象的元素遍历机制。
 - `XMLHandle`的所用是简化代码编写工作，使用XMLHandle将减少很多判空代码(if nil == xxx {}),活用XMLHandle将会让XML文件的元素事半功倍。
 
-# 如何使用
 ##  加载文档
 LoadDocument用于从一个文件流或者字符流读取XML数据，并构建出XMLDocument对象，一般用于读取XML文件的场景。
 ```go
