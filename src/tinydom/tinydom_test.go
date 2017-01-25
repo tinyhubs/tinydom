@@ -372,7 +372,7 @@ func Test_Comment_含有错误注释的XML流(t *testing.T) {
 }
 
 func Test_Text_基本功能测试(t *testing.T) {
-    xml := `<node>text1<elem1>text2</elem1>\ttext3\n<elem2>\t\n      </elem2></node>`
+    xml := "<node>text1<elem1>text2</elem1>\ttext3\n<elem2>\t\n      </elem2></node>"
     doc, err := tinydom.LoadDocument(strings.NewReader(xml))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
@@ -406,9 +406,22 @@ func Test_Text_基本功能测试(t *testing.T) {
     expect(t, "全空白的Text不会被读取", nil == text4)
     
     //  Text的数据获取
-    expect(t, "Text的数据获取", "text1 " == text1.Value())
-    expect(t, "Text的数据获取", "text2 " == text2.Value())
-    expect(t, "如果不是全部为空白，那么空白部分也属于Text", "\ttext3\n " == text3.Value())
+    expect(t, "Text的数据获取", "text1" == text1.Value())
+    expect(t, "Text的数据获取", "text2" == text2.Value())
+    expect(t, "如果不是全部为空白，那么空白部分也属于Text", "\ttext3\n" == text3.Value())
+
+    //  父的Element可以通过Text直接获得第一个子节点的文本
+    expect(t, "Text的数据获取", "text1" == node.Text())
+    
+    //  修改Text
+    text1.SetValue("Hello World")
+    expect(t, "修改Text的内容", "Hello World" == text1.Value())
+    
+    node.SetText("<TEXT>TextListXML</TEXT>")
+    expect(t, "node可以直接获取第一个Text节点的值", "<TEXT>TextListXML</TEXT>" == node.Text())
+    
+    elem2.SetText("NewText")
+    expect(t, "当通过Element.Text设置一个没有Text节点的值时，自动新建Text子节点", "NewText" == elem2.Text())
 }
 
 func Test_Text_Text出现在跟节点之外(t *testing.T) {
@@ -417,3 +430,5 @@ func Test_Text_Text出现在跟节点之外(t *testing.T) {
     expect(t, "返回值检测", nil == doc)
     expect(t, "返回值检测", nil != err)
 }
+
+
