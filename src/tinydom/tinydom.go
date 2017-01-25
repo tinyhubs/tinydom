@@ -22,7 +22,7 @@ FirstChildElement、LastChildElement、PreviousSiblingElement、NextSiblingEleme
     <books>
         <book><name>The Moon</name><author>Tom</author></book>
         <book><name>Go west</name><author>Suny</author></book>
-    <books>
+    </books>
     `
     doc, _ := tinydom.LoadDocument(strings.NewReader(xmlstr))
 
@@ -111,6 +111,7 @@ type XMLAttribute interface {
 
 //  XMLNode 定义了XML所有节点的基础设施，提供了基本的元素遍历、增删等操作,也提供了逆向转换能力.
 type XMLNode interface {
+    ToNode() XMLNode
     ToElement() XMLElement
     ToText() XMLText
     ToComment() XMLComment
@@ -179,10 +180,10 @@ type XMLElement interface {
     ForeachAttribute(callback func(attribute XMLAttribute) int) int
     
     AttributeCount() int
-    
     Attribute(name string, def string) string
-    SetAttribute(name string, value string)
-    DeleteAttribute(name string)
+    SetAttribute(name string, value string) XMLAttribute
+    DeleteAttribute(name string) XMLAttribute
+    ClearAttributes()
     
     Text() string
     SetText(text string)
@@ -197,6 +198,8 @@ type XMLText interface {
 
 type XMLComment interface {
     XMLNode
+    Comment() string
+    SetComment(string)
 }
 
 type XMLProcInst interface {
@@ -237,6 +240,7 @@ type XMLHandle interface {
     PreviousSiblingElement(name string) XMLHandle
     NextSiblingElement(name string) XMLHandle
     
+    ToNode() XMLNode
     ToElement() XMLElement
     ToText() XMLText
     ToComment() XMLComment
@@ -355,6 +359,10 @@ func (this *xmlNodeImpl) ToProcInst() XMLProcInst {
 
 func (this *xmlNodeImpl) ToDirective() XMLDirective {
     return nil
+}
+
+func (this *xmlNodeImpl) ToNode() XMLNode {
+    return this
 }
 
 func (this *xmlNodeImpl) Value() string {
@@ -604,6 +612,10 @@ func (this *xmlElementImpl) SetName(name string) {
 }
 
 func (this *xmlElementImpl) FindAttribute(name string) XMLAttribute {
+    if nil == this.attributes {
+        return nil
+    }
+    
     attr, ok := this.attributes[name]
     if !ok {
         return nil
@@ -613,10 +625,17 @@ func (this *xmlElementImpl) FindAttribute(name string) XMLAttribute {
 }
 
 func (this *xmlElementImpl) AttributeCount() int {
+    if nil == this.attributes {
+        return 0
+    }
     return len(this.attributes)
 }
 
 func (this *xmlElementImpl) Attribute(name string, def string) string {
+    if nil == this.attributes {
+        return def
+    }
+    
     attr, ok := this.attributes[name]
     if !ok {
         return def
@@ -625,19 +644,32 @@ func (this *xmlElementImpl) Attribute(name string, def string) string {
     return attr.Value()
 }
 
-func (this *xmlElementImpl) SetAttribute(name string, value string) {
+func (this *xmlElementImpl) SetAttribute(name string, value string) XMLAttribute {
+    if nil == this.attributes {
+        this.attributes = make(map[string]XMLAttribute)
+        attr := newAttribute(name, value)
+        this.attributes[name] = attr
+        return attr
+    }
     
     attr, ok := this.attributes[name]
     if ok {
         attr.SetValue(value)
-        return
+        return attr
     }
     
-    this.attributes[name] = NewAttribute(name, value)
+    attr = newAttribute(name, value)
+    this.attributes[name] = attr
+    return attr
 }
 
-func (this *xmlElementImpl) DeleteAttribute(name string) {
+func (this *xmlElementImpl) DeleteAttribute(name string) XMLAttribute {
+    attr := this.FindAttribute(name)
+    if nil == attr {
+        return nil
+    }
     delete(this.attributes, name)
+    return attr
 }
 
 func (this *xmlElementImpl) Text() string {
@@ -658,6 +690,10 @@ func (this *xmlElementImpl) SetText(inText string) {
 }
 
 func (this *xmlElementImpl) ForeachAttribute(callback func(attribute XMLAttribute) int) int {
+    if nil == this.attributes {
+        return 0
+    }
+    
     for _, value := range this.attributes {
         if ret := callback(value); 0 != ret {
             return ret
@@ -665,6 +701,10 @@ func (this *xmlElementImpl) ForeachAttribute(callback func(attribute XMLAttribut
     }
     
     return 0
+}
+
+func (this *xmlElementImpl) ClearAttributes() {
+    this.attributes = nil
 }
 
 //------------------------------------------------------------------
@@ -675,6 +715,14 @@ type xmlCommentImpl struct {
 
 func (this *xmlCommentImpl) ToComment() XMLComment {
     return this
+}
+
+func (this *xmlCommentImpl) Comment() string {
+    return this.value
+}
+
+func (this *xmlCommentImpl) SetComment(newComment string) {
+    this.value = newComment
 }
 
 func (this *xmlCommentImpl) Accept(visitor XMLVisitor) bool {
@@ -804,9 +852,9 @@ func NewDirective(document XMLDocument, directive string) XMLDirective {
     return node
 }
 
-//	NewAttribute	创建一个新的XMLAttribute对象.
+//	newAttribute	创建一个新的XMLAttribute对象.
 //	name和value分别用于指定属性的名称和值
-func NewAttribute(name string, value string) XMLAttribute {
+func newAttribute(name string, value string) XMLAttribute {
     attr := new(xmlAttributeImpl)
     attr.name = name
     attr.value = value
@@ -833,6 +881,9 @@ func LoadDocument(rd io.Reader) (XMLDocument, error) {
             startElement := token.(xml.StartElement)
             node := NewElement(doc, startElement.Name.Local)
             for _, item := range startElement.Attr {
+                if nil != node.FindAttribute(item.Name.Local) {
+                    return nil, errors.New("Attributes have the same name:" + item.Name.Local)
+                }
                 node.SetAttribute(item.Name.Local, item.Value)
             }
             parent.InsertEndChild(node)
@@ -866,7 +917,7 @@ func LoadDocument(rd io.Reader) (XMLDocument, error) {
     if (nil == err) || (io.EOF == err) {
         
         //  不能是空文档
-        if nil == doc.FirstChildElement(""){
+        if nil == doc.FirstChildElement("") {
             return nil, errors.New("XML document missing the root element")
         }
         
@@ -1036,6 +1087,14 @@ func (this*XMLHandleImpl) NextSiblingElement(name string) XMLHandle {
     }
     
     return this
+}
+
+func (this*XMLHandleImpl) ToNode() XMLNode {
+    if nil != this.node {
+        return this.node.ToNode()
+    }
+    
+    return nil
 }
 
 func (this*XMLHandleImpl) ToElement() XMLElement {
