@@ -110,30 +110,6 @@ type XMLAttribute interface {
 }
 
 //  XMLNode 定义了XML所有节点的基础设施，提供了基本的元素遍历、增删等操作,也提供了逆向转换能力.
-//  XMLElement、XMLText、XMLComment、XMLDocument、XMLProcInst、XMLDirective等同属于XMLNode.
-//  Value   节点的值。
-//  不同类型的节点其Value的值所表示的含义不同：
-//      -   XMLElement:节点的名称
-//      -   XMLText:节点的文本内容
-//      -   XMLComment:<!--与-->之间的文本内容
-//      -   XMLDocument:总是返回空字符串""
-//      -   XMLProcInst:<?后的第一个名字
-//      -   XMLDirective:<!与>之间的素有文本内容
-//  GetDocument 获取节点所属的文档对象
-//  NoChildren  用于判断是否有子节点
-//  Parent  获取一个节点的父节点
-//  FirstChild  查找第一个子节点
-//  LastChild   查找最后一个子节点
-//  PreviousSibling 返回相邻的前一个兄弟节点
-//  NextSibling 返回相邻的下一个兄弟节点
-//  FirstChildElement 在当前节点下，查找元素名为name的第一个子元素，如果name为空字符串表示查找第一个子元素
-//  LastChildElement    在当前节点下，查找元素名为name的最后一个子元素，如果name为空字符串表示查找最后一个子元素
-//  PreviousSiblingElement  查找本与跟节点相邻的前一个名字为name的元素，如果name为空，表示查找相邻的前一个元素
-//  NextSiblingElement  查找与本节点相邻的下一个名字为name的元素，如果name为空，表示查找相邻的下一个元素
-//  InsertEndChild  将node添加为本节点的最后一个子节点
-//  InsertFirstChild  将node添加为本节点的第一个子节点
-//  InsertAfterChild    将addThis节点添加到afterThis之后
-//  DeleteChildren  删除本节点的所有子节点
 type XMLNode interface {
     ToElement() XMLElement
     ToText() XMLText
@@ -184,6 +160,15 @@ type XMLNode interface {
     unlink(child XMLNode)
 }
 
+//  XMLElement  提供了访问XML基本节点元素的能力
+//
+//  Name、SetName其实是Value和SetValue的别名，目的是为了使得接口更加符合直观理解。
+//
+//  Text、SetText的作用是设置<node>与</node>之间的文字，虽然文字都是有XMLText对象来承载的，但是通常来说直接在XMLElement中访问会更加方便。
+//
+//  FindAttribute和ForeachAttribute分别用于查找特定的XML节点的属性和遍历XML属性列表。
+//
+//  Attribute、SetAttribute、DeleteAttribute用于读取和删除属性。
 type XMLElement interface {
     XMLNode
     
@@ -191,6 +176,8 @@ type XMLElement interface {
     SetName(name string)
     
     FindAttribute(name string) XMLAttribute
+    ForeachAttribute(callback func(attribute XMLAttribute) int) int
+    
     AttributeCount() int
     
     Attribute(name string, def string) string
@@ -199,10 +186,9 @@ type XMLElement interface {
     
     Text() string
     SetText(text string)
-    
-    ForeachAttribute(callback func(attribute XMLAttribute) int) int
 }
 
+//  XMLText 提供了对XML元素间文本的封装
 type XMLText interface {
     XMLNode
     SetCDATA(isCData bool)
@@ -238,6 +224,25 @@ type XMLVisitor interface {
     VisitText(XMLText) bool
     VisitComment(XMLComment) bool
     VisitDirective(XMLDirective) bool
+}
+
+type XMLHandle interface {
+    Parent() XMLHandle
+    FirstChild() XMLHandle
+    LastChild() XMLHandle
+    PreviousSibling() XMLHandle
+    NextSibling() XMLHandle
+    FirstChildElement(name string) XMLHandle
+    LastChildElement(name string) XMLHandle
+    PreviousSiblingElement(name string) XMLHandle
+    NextSiblingElement(name string) XMLHandle
+    
+    ToElement() XMLElement
+    ToText() XMLText
+    ToComment() XMLComment
+    ToDocument() XMLDocument
+    ToProcInst() XMLProcInst
+    ToDirective() XMLDirective
 }
 
 //=========================================================
@@ -859,6 +864,12 @@ func LoadDocument(rd io.Reader) (XMLDocument, error) {
     }
     
     if (nil == err) || (io.EOF == err) {
+        
+        //  不能是空文档
+        if nil == doc.FirstChildElement(""){
+            return nil, errors.New("XML document missing the root element")
+        }
+        
         return doc, nil
     }
     
@@ -868,7 +879,6 @@ func LoadDocument(rd io.Reader) (XMLDocument, error) {
 //------------------------------------------------------------------
 type xmlSimplePrinter struct {
     writer io.Writer
-    
 }
 
 func NewSimplePrinter(writer io.Writer) XMLVisitor {
@@ -943,4 +953,135 @@ func (this *xmlSimplePrinter) VisitDirective(node XMLDirective) bool {
     xml.EscapeText(this.writer, []byte(node.Value()))
     io.WriteString(this.writer, ">")
     return true
+}
+
+//------------------------------------------------------------------
+type XMLHandleImpl struct {
+    node XMLNode
+}
+
+func NewHandle(node XMLNode) XMLHandle {
+    handle := new(XMLHandleImpl)
+    handle.node = node
+    return handle
+}
+
+func (this*XMLHandleImpl) Parent() XMLHandle {
+    if nil != this.node {
+        this.node = this.node.Parent()
+    }
+    
+    return this
+}
+
+func (this*XMLHandleImpl) FirstChild() XMLHandle {
+    if nil != this.node {
+        this.node = this.node.FirstChild()
+    }
+    
+    return this
+}
+
+func (this*XMLHandleImpl) LastChild() XMLHandle {
+    if nil != this.node {
+        this.node = this.node.LastChild()
+    }
+    
+    return this
+}
+
+func (this*XMLHandleImpl) PreviousSibling() XMLHandle {
+    if nil != this.node {
+        this.node = this.node.PreviousSibling()
+    }
+    
+    return this
+}
+
+func (this*XMLHandleImpl) NextSibling() XMLHandle {
+    if nil != this.node {
+        this.node = this.node.NextSibling()
+    }
+    
+    return this
+}
+
+func (this*XMLHandleImpl) FirstChildElement(name string) XMLHandle {
+    if nil != this.node {
+        this.node = this.node.FirstChildElement(name)
+    }
+    
+    return this
+}
+
+func (this*XMLHandleImpl) LastChildElement(name string) XMLHandle {
+    if nil != this.node {
+        this.node = this.node.LastChildElement(name)
+    }
+    
+    return this
+}
+
+func (this*XMLHandleImpl) PreviousSiblingElement(name string) XMLHandle {
+    if nil != this.node {
+        this.node = this.node.PreviousSiblingElement(name)
+    }
+    
+    return this
+}
+
+func (this*XMLHandleImpl) NextSiblingElement(name string) XMLHandle {
+    if nil != this.node {
+        this.node = this.node.NextSiblingElement(name)
+    }
+    
+    return this
+}
+
+func (this*XMLHandleImpl) ToElement() XMLElement {
+    if nil != this.node {
+        return this.node.ToElement()
+    }
+    
+    return nil
+}
+
+func (this*XMLHandleImpl) ToText() XMLText {
+    if nil != this.node {
+        return this.node.ToText()
+    }
+    
+    return nil
+}
+
+func (this*XMLHandleImpl) ToComment() XMLComment {
+    if nil != this.node {
+        return this.node.ToComment()
+    }
+    
+    return nil
+}
+
+func (this*XMLHandleImpl) ToDocument() XMLDocument {
+    if nil != this.node {
+        return this.node.ToDocument()
+    }
+    
+    return nil
+}
+
+func (this*XMLHandleImpl) ToProcInst() XMLProcInst {
+    if nil != this.node {
+        return this.node.ToProcInst()
+    }
+    
+    return nil
+}
+
+func (this*XMLHandleImpl) ToDirective() XMLDirective {
+    if nil != this.node {
+        return this.node.ToDirective()
+    }
+    
+    return nil
 }
