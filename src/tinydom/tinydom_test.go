@@ -85,32 +85,32 @@ func Test_example4(t *testing.T) {
     doc.Accept(tinydom.NewSimplePrinter(os.Stdout))
 }
 
-func Test_空文档_加载失败(t *testing.T) {
+func Test_Document_空文档_加载失败(t *testing.T) {
     doc, err := tinydom.LoadDocument(strings.NewReader(""))
     expect(t, "返回值检测", nil == doc)
     expect(t, "返回值检测", nil != err)
 }
 
-func Test_格式错误_节点未关闭(t *testing.T) {
+func Test_Document_格式错误_节点未关闭(t *testing.T) {
     doc, err := tinydom.LoadDocument(strings.NewReader("<node><elem></node>"))
     expect(t, "返回值检测", nil == doc)
     expect(t, "返回值检测", nil != err)
 }
 
-func Test_格式错误_关闭节点多余(t *testing.T) {
+func Test_Document_格式错误_关闭节点多余(t *testing.T) {
     doc, err := tinydom.LoadDocument(strings.NewReader("<node><elem></elem></elem></node>"))
     expect(t, "返回值检测", nil == doc)
     expect(t, "返回值检测", nil != err)
 }
 
-func Test_格式错误_多余的节点(t *testing.T) {
+func Test_Document_格式错误_多余的节点(t *testing.T) {
     doc, err := tinydom.LoadDocument(strings.NewReader("<node><elem></elem></node><hello/>"))
     doc.Accept(tinydom.NewSimplePrinter(os.Stdout))
     expect(t, "返回值检测", nil == doc)
     expect(t, "返回值检测", nil != err)
 }
 
-func Test_正常的XML文档1(t *testing.T) {
+func Test_Node_正常的XML文档1(t *testing.T) {
     doc, err := tinydom.LoadDocument(strings.NewReader("<node></node>"))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
@@ -139,7 +139,7 @@ func Test_正常的XML文档1(t *testing.T) {
     expect(t, "转换检查", nil == node.ToText())
 }
 
-func Test_正常的XML文档2(t *testing.T) {
+func Test_Node_正常的XML文档2(t *testing.T) {
     doc, err := tinydom.LoadDocument(strings.NewReader("<node><elem></elem></node>"))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
@@ -185,7 +185,7 @@ func Test_正常的XML文档2(t *testing.T) {
     expect(t, "topo结构检查", nil == elem.NextSiblingElement(""))
 }
 
-func Test_正常的XML文档3(t *testing.T) {
+func Test_Node_正常的XML文档3(t *testing.T) {
     doc, err := tinydom.LoadDocument(strings.NewReader("<node><elem1></elem1><elem2></elem2><elem3></elem3></node>"))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
@@ -431,4 +431,47 @@ func Test_Text_Text出现在跟节点之外(t *testing.T) {
     expect(t, "返回值检测", nil != err)
 }
 
+func Test_Directive_基本功能测试(t *testing.T) {
+    xml := `
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE poem [
+        <!ELEMENT poem (author, title, content)>
+        <!ELEMENT author (#PCDATA)>
+        <!ELEMENT title (#PCDATA)>
+        <!ELEMENT content (#PCDATA)>
+    ]>
+    <!--为元素poem定义了三个子元素author title content，
+    这三个元素必须要出现并且必须按照这个顺序
+    少元素不行，多元素也不行
+    -->
+    <!--指明author,title,content里面的内容是字符串类型-->
+    <poem>
+        <author>王维</author>
+        <title>鹿柴</title>
+        <content>空山不见人，但闻人语声。返景入深林，复照青苔上。</content>
+    </poem>
+    `
+    doc, err := tinydom.LoadDocument(strings.NewReader(xml))
+    expect(t, "返回值检测", nil != doc)
+    expect(t, "返回值检测", nil == err)
+
+
+    //  转换
+    doctype := doc.FirstChild().NextSibling()
+    expect(t, "转换测试", nil != doctype.ToDirective())
+    expect(t, "转换测试", nil != doctype.ToNode())
+    expect(t, "转换测试", nil == doctype.ToText())
+    expect(t, "转换测试", nil == doctype.ToComment())
+    expect(t, "转换测试", nil == doctype.ToProcInst())
+    expect(t, "转换测试", nil == doctype.ToDocument())
+    expect(t, "转换测试", nil == doctype.ToElement())
+
+    cmp := `DOCTYPE poem [
+        <!ELEMENT poem (author, title, content)>
+        <!ELEMENT author (#PCDATA)>
+        <!ELEMENT title (#PCDATA)>
+        <!ELEMENT content (#PCDATA)>
+    ]`
+    expect(t, "转换测试", cmp == doctype.Value())
+}
 
