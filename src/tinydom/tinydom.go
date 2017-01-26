@@ -761,6 +761,7 @@ type xmlDocumentImpl struct {
 func (this *xmlDocumentImpl) ToDocument() XMLDocument {
     return this
 }
+
 func (this *xmlDocumentImpl) Accept(visitor XMLVisitor) bool {
     
     if visitor.VisitEnterDocument(this) {
