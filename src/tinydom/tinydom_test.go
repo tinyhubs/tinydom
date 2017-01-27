@@ -19,11 +19,12 @@ func expect(t *testing.T, message string, result bool) {
 
 func Test_example1(t *testing.T) {
 	xmlstr := `
-    <books>
-        <book><name>The Moon</name><author>Tom</author></book>
-        <book><name>Go west</name><author>Suny</author></book>
-    </books>
-    `
+	<books>
+	<book><name>The Moon</name><author>Tom</author></book>
+	<book><name>Go west</name><author>Suny</author></book>
+	</books>
+	`
+
 	doc, _ := tinydom.LoadDocument(strings.NewReader(xmlstr))
 	elem1 := doc.FirstChildElement("books").FirstChildElement("book").FirstChildElement("name")
 	fmt.Println(elem1.Text()) //	The Moon
@@ -111,7 +112,11 @@ func Test_Document_格式错误_多余的节点(t *testing.T) {
 }
 
 func Test_Document_输出(t *testing.T) {
-	doc, err := tinydom.LoadDocument(strings.NewReader("<node><elem></elem></node><hello/>"))
+	xml := `<?xml version="1.0" encoding="UTF-8"?>
+	<!--comment1-->
+	<!DOCTYPE poem>
+	<node attr1="value1" attr2="value2"><elem><!--comment2--></elem><str>Hello world</str></node><hello/>`
+	doc, err := tinydom.LoadDocument(strings.NewReader(xml))
 	doc.Accept(tinydom.NewSimplePrinter(os.Stdout))
 	expect(t, "返回值检测", nil != doc)
 	expect(t, "返回值检测", nil == err)
@@ -505,4 +510,44 @@ func Test_Directive_基本功能测试(t *testing.T) {
         <!ELEMENT content (#PCDATA)>
     ]`
 	expect(t, "转换测试", cmp == doctype.Value())
+}
+
+func Test_Handle_空腹测试(t *testing.T) {
+	handle := tinydom.NewHandle(nil)
+	expect(t, "空转换测试", nil == handle.ToNode())
+	expect(t, "空转换测试", nil == handle.ToDirective())
+	expect(t, "空转换测试", nil == handle.ToText())
+	expect(t, "空转换测试", nil == handle.ToComment())
+	expect(t, "空转换测试", nil == handle.ToProcInst())
+	expect(t, "空转换测试", nil == handle.ToDocument())
+	expect(t, "空转换测试", nil == handle.ToElement())
+
+	expect(t, "空周游测试", nil == handle.Parent().ToNode())
+	expect(t, "空周游测试", nil == handle.FirstChild().ToNode())
+	expect(t, "空周游测试", nil == handle.LastChild().ToNode())
+	expect(t, "空周游测试", nil == handle.PreviousSibling().ToNode())
+	expect(t, "空周游测试", nil == handle.NextSibling().ToNode())
+	expect(t, "空周游测试", nil == handle.FirstChildElement("").ToNode())
+	expect(t, "空周游测试", nil == handle.LastChildElement("").ToNode())
+	expect(t, "空周游测试", nil == handle.PreviousSiblingElement("").ToNode())
+	expect(t, "空周游测试", nil == handle.NextSiblingElement("").ToNode())
+}
+
+func Test_Handle_基本功能测试(t *testing.T) {
+	xml := `<?xml version="1.0" encoding="UTF-8"?>
+	<!--comment1-->
+	<!DOCTYPE poem [
+        <!ELEMENT poem (author, title, content)>
+        <!ELEMENT author (#PCDATA)>
+        <!ELEMENT title (#PCDATA)>
+        <!ELEMENT content (#PCDATA)>
+    	]>
+	<node attr1="value1" attr2="value2"><elem><!--comment2--></elem><str>Hello world</str></node><hello/>`
+	doc, err := tinydom.LoadDocument(strings.NewReader(xml))
+	expect(t, "返回值检测", nil != doc)
+	expect(t, "返回值检测", nil == err)
+
+	handle := tinydom.NewHandle(doc)
+	expect(t, "周游测试", "xml" == handle.FirstChild().ToProcInst().Value())
+	expect(t, "周游测试", "comment1" == handle.FirstChild().NextSibling().ToComment().Value())
 }
