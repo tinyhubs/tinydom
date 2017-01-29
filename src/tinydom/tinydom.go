@@ -143,19 +143,8 @@ type XMLNode interface {
 	Accept(visitor XMLVisitor) bool
 
 	//  被迫入侵的接口
-	//getDocument() XMLDocument
-	//setDocument(document XMLDocument)
-	//getParent() XMLNode
 	setParent(node XMLNode)
-	//getValue() string
-	//setValue(value string)
-	//getFirstChild() XMLNode
-	//setFirstChild(node XMLNode)
-	//getLastChild() XMLNode
-	//setLastChild(node XMLNode)
-	//getPrev() XMLNode
 	setPrev(node XMLNode)
-	//getNext() XMLNode
 	setNext(node XMLNode)
 
 	unlink(child XMLNode)
@@ -251,29 +240,8 @@ type XMLHandle interface {
 	ToDirective() XMLDirective
 }
 
-//type XMLCursor interface{
-//    Parent() XMLCursor
-//    FirstChild() XMLCursor
-//    LastChild() XMLCursor
-//    PreviousSibling() XMLCursor
-//    NextSibling() XMLCursor
-//    FirstChildElement(name string) XMLCursor
-//    LastChildElement(name string) XMLCursor
-//    PreviousSiblingElement(name string) XMLCursor
-//    NextSiblingElement(name string) XMLCursor
-//
-//    ToNode() XMLNode
-//    ToElement() XMLElement
-//    ToText() XMLText
-//    ToComment() XMLComment
-//    ToDocument() XMLDocument
-//    ToProcInst() XMLProcInst
-//    ToDirective() XMLDirective
-//
-//    Root() XMLCursor
-//}
-
 //=========================================================
+
 type xmlAttributeImpl struct {
 	name  string
 	value string
@@ -309,53 +277,13 @@ func (this *xmlNodeImpl) getDocument() XMLDocument {
 	return this.document
 }
 
-//func (this *xmlNodeImpl) setDocument(document XMLDocument) {
-//	this.document = document
-//}
-
-//func (this *xmlNodeImpl) getParent() XMLNode {
-//	return this.parent
-//}
-
 func (this *xmlNodeImpl) setParent(node XMLNode) {
 	this.parent = node
 }
 
-//func (this *xmlNodeImpl) getValue() string {
-//	return this.value
-//}
-
-//func (this *xmlNodeImpl) setValue(value string) {
-//	this.value = value
-//}
-
-//func (this *xmlNodeImpl) getFirstChild() XMLNode {
-//	return this.firstChild
-//}
-
-//func (this *xmlNodeImpl) setFirstChild(node XMLNode) {
-//	this.firstChild = node
-//}
-
-//func (this *xmlNodeImpl) getLastChild() XMLNode {
-//	return this.lastChild
-//}
-
-//func (this *xmlNodeImpl) setLastChild(node XMLNode) {
-//	this.lastChild = node
-//}
-
-//func (this *xmlNodeImpl) getPrev() XMLNode {
-//	return this.prev
-//}
-
 func (this *xmlNodeImpl) setPrev(node XMLNode) {
 	this.prev = node
 }
-
-//func (this *xmlNodeImpl) getNext() XMLNode {
-//	return this.next
-//}
 
 func (this *xmlNodeImpl) setNext(node XMLNode) {
 	this.next = node
@@ -1032,146 +960,6 @@ func (this *xmlSimplePrinter) VisitDirective(node XMLDirective) bool {
 }
 
 //------------------------------------------------------------------
-//
-//type xmlCursorImpl struct {
-//    node XMLNode
-//}
-//
-//func NewCursor(node XMLNode) XMLHandle {
-//    handle := new(xmlPathImpl)
-//    handle.node = node
-//    return handle
-//}
-//
-//func (this*xmlCursorImpl) Parent() XMLHandle {
-//    if nil != this.node {
-//        this.node = this.node.Parent()
-//    }
-//
-//    return this
-//}
-//
-//func (this*xmlCursorImpl) FirstChild() XMLHandle {
-//    if nil != this.node {
-//        this.node = this.node.FirstChild()
-//    }
-//
-//    return this
-//}
-//
-//func (this*xmlCursorImpl) LastChild() XMLHandle {
-//    if nil != this.node {
-//        this.node = this.node.LastChild()
-//    }
-//
-//    return this
-//}
-//
-//func (this*xmlCursorImpl) PreviousSibling() XMLHandle {
-//    if nil != this.node {
-//        this.node = this.node.PreviousSibling()
-//    }
-//
-//    return this
-//}
-//
-//func (this*xmlCursorImpl) NextSibling() XMLHandle {
-//    if nil != this.node {
-//        this.node = this.node.NextSibling()
-//    }
-//
-//    return this
-//}
-//
-//func (this*xmlCursorImpl) FirstChildElement(name string) XMLHandle {
-//    if nil != this.node {
-//        this.node = this.node.FirstChildElement(name)
-//    }
-//
-//    return this
-//}
-//
-//func (this*xmlCursorImpl) LastChildElement(name string) XMLHandle {
-//    if nil != this.node {
-//        this.node = this.node.LastChildElement(name)
-//    }
-//
-//    return this
-//}
-//
-//func (this*xmlCursorImpl) PreviousSiblingElement(name string) XMLHandle {
-//    if nil != this.node {
-//        this.node = this.node.PreviousSiblingElement(name)
-//    }
-//
-//    return this
-//}
-//
-//func (this*xmlCursorImpl) NextSiblingElement(name string) XMLHandle {
-//    if nil != this.node {
-//        this.node = this.node.NextSiblingElement(name)
-//    }
-//
-//    return this
-//}
-//
-//func (this*xmlCursorImpl) ToNode() XMLNode {
-//    if nil != this.node {
-//        return this.node.ToNode()
-//    }
-//
-//    return nil
-//}
-//
-//func (this*xmlCursorImpl) ToElement() XMLElement {
-//    if nil != this.node {
-//        return this.node.ToElement()
-//    }
-//
-//    return nil
-//}
-//
-//func (this*xmlCursorImpl) ToText() XMLText {
-//    if nil != this.node {
-//        return this.node.ToText()
-//    }
-//
-//    return nil
-//}
-//
-//func (this*xmlCursorImpl) ToComment() XMLComment {
-//    if nil != this.node {
-//        return this.node.ToComment()
-//    }
-//
-//    return nil
-//}
-//
-//func (this*xmlCursorImpl) ToDocument() XMLDocument {
-//    if nil != this.node {
-//        return this.node.ToDocument()
-//    }
-//
-//    return nil
-//}
-//
-//func (this*xmlCursorImpl) ToProcInst() XMLProcInst {
-//    if nil != this.node {
-//        return this.node.ToProcInst()
-//    }
-//
-//    return nil
-//}
-//
-//func (this*xmlCursorImpl) ToDirective() XMLDirective {
-//    if nil != this.node {
-//        return this.node.ToDirective()
-//    }
-//
-//    return nil
-//}
-
-//------------------------------------------------------------------
 
 type xmlHandleImpl struct {
 	node XMLNode
@@ -1261,7 +1049,6 @@ func (this *xmlHandleImpl) ToNode() XMLNode {
 	}
 
 	return this.node.ToNode()
-
 }
 
 func (this *xmlHandleImpl) ToElement() XMLElement {
@@ -1278,7 +1065,6 @@ func (this *xmlHandleImpl) ToText() XMLText {
 	}
 
 	return this.node.ToText()
-
 }
 
 func (this *xmlHandleImpl) ToComment() XMLComment {

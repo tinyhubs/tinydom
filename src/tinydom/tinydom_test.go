@@ -235,7 +235,7 @@ func Test_Node_正常的XML文档3(t *testing.T) {
 	expect(t, "topo结构检查", true == elem3.NoChildren())
 }
 
-func Test_Node_修改文档(t *testing.T) {
+func Test_Node_修改文档1(t *testing.T) {
 	doc, err := tinydom.LoadDocument(strings.NewReader("<node><elem1></elem1><elem2></elem2><elem3></elem3></node>"))
 	expect(t, "返回值检测", nil != doc)
 	expect(t, "返回值检测", nil == err)
@@ -258,6 +258,9 @@ func Test_Node_修改文档(t *testing.T) {
 	doc.DeleteChild(new3)
 	doc.DeleteChild(new4)
 	node.DeleteChildren()
+
+    node.SetName("NewNode")
+    expect(t, "添加成功", "NewNode" == node.Value())
 }
 
 func Test_Element_属性同名错误(t *testing.T) {
@@ -542,12 +545,43 @@ func Test_Handle_基本功能测试(t *testing.T) {
         <!ELEMENT title (#PCDATA)>
         <!ELEMENT content (#PCDATA)>
     	]>
-	<node attr1="value1" attr2="value2"><elem><!--comment2--></elem><str>Hello world</str></node><hello/>`
+	<node attr1="value1" attr2="value2"><elem><!--comment2--></elem><elem>126</elem><str>Hello world</str></node><hello/>`
 	doc, err := tinydom.LoadDocument(strings.NewReader(xml))
 	expect(t, "返回值检测", nil != doc)
 	expect(t, "返回值检测", nil == err)
 
 	handle := tinydom.NewHandle(doc)
+    expect(t, "周游测试", nil != handle.ToDocument())
 	expect(t, "周游测试", "xml" == handle.FirstChild().ToProcInst().Value())
 	expect(t, "周游测试", "comment1" == handle.FirstChild().NextSibling().ToComment().Value())
+
+    node := handle.FirstChildElement("node")
+    //parent := node.Parent()
+    //doc = parent.ToDocument()
+    expect(t, "周游测试", "node" == node.ToNode().Value())
+    //expect(t, "周游测试", nil != parent.ToDocument())
+    expect(t, "周游测试", "" == node.FirstChildElement("elem").ToElement().Text())
+    expect(t, "周游测试", "126" == node.LastChildElement("elem").ToElement().Text())
+    expect(t, "周游测试", "" == node.LastChildElement("elem").PreviousSiblingElement("elem").ToElement().Text())
+    expect(t, "周游测试", "126" == node.FirstChildElement("elem").NextSiblingElement("elem").ToElement().Text())
+    expect(t, "周游测试", "126" == node.LastChildElement("elem").FirstChild().ToText().Value())
+    expect(t, "周游测试", "126" == node.LastChildElement("elem").LastChild().ToText().Value())
+
+	str := node.FirstChildElement("str")
+    expect(t, "周游测试", "elem" == str.PreviousSibling().ToElement().Value())
+    expect(t, "周游测试", nil != handle.FirstChildElement("node").PreviousSibling().ToDirective())
 }
+
+func Test_Node_修改文档2(t *testing.T) {
+    doc, err := tinydom.LoadDocument(strings.NewReader("<node><elem1/></node>"))
+    expect(t, "返回值检测", nil != doc)
+    expect(t, "返回值检测", nil == err)
+
+    node := doc.FirstChildElement("node")
+    elem1 := node.FirstChildElement("elem1")
+    elem1.SetName("newelem")
+
+    node.DeleteChild(elem1)
+    node.InsertEndChild(elem1)
+}
+
