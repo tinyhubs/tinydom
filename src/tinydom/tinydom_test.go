@@ -545,7 +545,7 @@ func Test_Handle_基本功能测试(t *testing.T) {
         <!ELEMENT title (#PCDATA)>
         <!ELEMENT content (#PCDATA)>
     	]>
-	<node attr1="value1" attr2="value2"><elem><!--comment2--></elem><elem>126</elem><str>Hello world</str></node><hello/>`
+	<node attr1="value1" attr2="value2"><elem><!--comment2--></elem><elem>126</elem><str>Hello world</str></node>`
 	doc, err := tinydom.LoadDocument(strings.NewReader(xml))
 	expect(t, "返回值检测", nil != doc)
 	expect(t, "返回值检测", nil == err)
@@ -585,3 +585,10 @@ func Test_Node_修改文档2(t *testing.T) {
     node.InsertEndChild(elem1)
 }
 
+func Test_Handle_基本功能测试2(t *testing.T) {
+	xml := `<node attr1="value1" attr2="value2"></node>`
+	doc, err := tinydom.LoadDocument(strings.NewReader(xml))
+	expect(t, "返回值检测", nil != doc)
+	expect(t, "返回值检测", nil == err)
+	expect(t, "返回值检测", nil != doc.FirstChild().Parent().ToDocument())
+}
