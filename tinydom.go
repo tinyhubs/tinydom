@@ -875,10 +875,11 @@ func LoadDocument(rd io.Reader) (XMLDocument, error) {
             parent.InsertEndChild(node)
         case xml.CharData:
             charData := token.(xml.CharData)
-            if doc == parent {
-                return nil, errors.New("Text should be in the element")
-            }
             if len(bytes.TrimSpace(charData)) > 0 {
+                if doc == parent {
+                    return nil, errors.New("Text should be in the element")
+                }
+
                 node := NewText(doc, string(charData))
                 parent.InsertEndChild(node)
             }
