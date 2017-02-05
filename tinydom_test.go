@@ -114,7 +114,7 @@ func Test_Document_输出(t *testing.T) {
     xml := `<?xml version="1.0" encoding="UTF-8"?>
 	<!--comment1-->
 	<!DOCTYPE poem>
-	<node attr1="value1" attr2="value2"><elem><!--comment2--></elem><str>Hello world</str></node><hello/>`
+	<node attr1="value1" attr2="value2"><elem><!--comment2--></elem><str>Hello world</str><hello/></node>`
     doc, err := tinydom.LoadDocument(strings.NewReader(xml))
     doc.Accept(tinydom.NewSimplePrinter(os.Stdout))
     expect(t, "返回值检测", nil != doc)

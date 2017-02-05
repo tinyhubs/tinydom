@@ -837,8 +837,15 @@ func LoadDocument(rd io.Reader) (XMLDocument, error) {
         switch token.(type) {
         case xml.StartElement:
             startElement := token.(xml.StartElement)
-            if rootElemExist {
-                return nil, errors.New("Root element has been exist:" + startElement.Name.Local)
+
+            //  一个XML文档只允许有唯一一个根节点
+            if doc == parent {
+                if rootElemExist {
+                    return nil, errors.New("Root element has been exist:" + startElement.Name.Local)
+                }
+
+                //  标记一下根节点已经存在了
+                rootElemExist = true
             }
 
             node := NewElement(doc, startElement.Name.Local)
@@ -851,8 +858,6 @@ func LoadDocument(rd io.Reader) (XMLDocument, error) {
             parent.InsertEndChild(node)
             parent = node
 
-            //  标记一下根节点已经存在了
-            rootElemExist = true
         case xml.EndElement:
             //endElement := token.(xml.EndElement)
             parent = parent.Parent()
@@ -870,6 +875,9 @@ func LoadDocument(rd io.Reader) (XMLDocument, error) {
             parent.InsertEndChild(node)
         case xml.CharData:
             charData := token.(xml.CharData)
+            if doc == parent {
+                return nil, errors.New("Text should be in the element")
+            }
             if len(bytes.TrimSpace(charData)) > 0 {
                 node := NewText(doc, string(charData))
                 parent.InsertEndChild(node)
