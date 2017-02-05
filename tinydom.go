@@ -875,7 +875,8 @@ func LoadDocument(rd io.Reader) (XMLDocument, error) {
             parent.InsertEndChild(node)
         case xml.CharData:
             charData := token.(xml.CharData)
-            if len(bytes.TrimSpace(charData)) > 0 {
+            shortCharData := bytes.TrimSpace(charData)
+            if (nil != shortCharData) || len(shortCharData) > 0 {
                 if doc == parent {
                     return nil, errors.New("Text should be in the element")
                 }
@@ -889,7 +890,6 @@ func LoadDocument(rd io.Reader) (XMLDocument, error) {
     }
 
     if (nil == err) || (io.EOF == err) {
-
         //  不能是空文档
         if nil == doc.FirstChildElement("") {
             return nil, errors.New("XML document missing the root element")
@@ -925,6 +925,7 @@ func (this *xmlSimplePrinter) VisitEnterElement(node XMLElement) bool {
     io.WriteString(this.writer, node.Name())
 
     node.ForeachAttribute(func(attribute XMLAttribute) int {
+        io.WriteString(this.writer, ` `)
         io.WriteString(this.writer, attribute.Name())
         io.WriteString(this.writer, `="`)
         xml.EscapeText(this.writer, []byte(attribute.Value()))
@@ -932,12 +933,21 @@ func (this *xmlSimplePrinter) VisitEnterElement(node XMLElement) bool {
         return 0
     })
 
-    io.WriteString(this.writer, ">")
+    if node.NoChildren() {
+        io.WriteString(this.writer, "/>")
 
+        return true
+    }
+
+    io.WriteString(this.writer, ">")
     return true
 }
 
 func (this *xmlSimplePrinter) VisitExitElement(node XMLElement) bool {
+    if node.NoChildren() {
+        return true
+    }
+
     io.WriteString(this.writer, "</")
     io.WriteString(this.writer, node.Name())
     io.WriteString(this.writer, ">")
@@ -1063,7 +1073,6 @@ func (this *xmlHandleImpl) NextSiblingElement(name string) XMLHandle {
 
     return NewHandle(this.node.NextSiblingElement(name))
 }
-
 
 func (this *xmlHandleImpl) ToNode() XMLNode {
     return this.node

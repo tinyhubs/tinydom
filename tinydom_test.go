@@ -6,6 +6,7 @@ import (
     "strings"
     "testing"
     "tinydom"
+    "bytes"
 )
 
 func expect(t *testing.T, message string, result bool) {
@@ -110,7 +111,7 @@ func Test_Document_格式错误_多余的节点(t *testing.T) {
     expect(t, "返回值检测", nil != err)
 }
 
-func Test_Document_输出(t *testing.T) {
+func Test_Document_输出_各种元素遍历(t *testing.T) {
     xml := `<?xml version="1.0" encoding="UTF-8"?>
 	<!--comment1-->
 	<!DOCTYPE poem>
@@ -119,10 +120,17 @@ func Test_Document_输出(t *testing.T) {
     doc.Accept(tinydom.NewSimplePrinter(os.Stdout))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
-    doc.Accept(tinydom.NewSimplePrinter(os.Stdout))
+
+    result := `<?xml version="1.0" encoding="UTF-8"?>` + "\n" +
+        `<!--comment1--><!DOCTYPE poem><node attr1="value1" attr2="value2"><elem><!--comment2--></elem><str>Hello world</str><hello/></node>`
+    buf := bytes.NewBufferString("")
+    doc.Accept(tinydom.NewSimplePrinter(buf))
+    fmt.Println("=========")
+    fmt.Println(buf)
+    expect(t, "检查输出", result == buf.String())
 }
 
-func Test_Node_正常的XML文档1(t *testing.T) {
+func Test_Node_正常的XML文档_特殊场景_只有一个根节点(t *testing.T) {
     doc, err := tinydom.LoadDocument(strings.NewReader("<node></node>"))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
@@ -151,7 +159,7 @@ func Test_Node_正常的XML文档1(t *testing.T) {
     expect(t, "转换检查", nil == node.ToText())
 }
 
-func Test_Node_正常的XML文档2(t *testing.T) {
+func Test_Node_正常的XML文档_特殊场景_只有一个子节点(t *testing.T) {
     doc, err := tinydom.LoadDocument(strings.NewReader("<node><elem></elem></node>"))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
@@ -197,7 +205,7 @@ func Test_Node_正常的XML文档2(t *testing.T) {
     expect(t, "topo结构检查", nil == elem.NextSiblingElement(""))
 }
 
-func Test_Node_正常的XML文档3(t *testing.T) {
+func Test_Node_正常的XML文档_丰富的文档结构(t *testing.T) {
     doc, err := tinydom.LoadDocument(strings.NewReader("<node><elem1></elem1><elem2></elem2><elem3></elem3></node>"))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
@@ -234,7 +242,7 @@ func Test_Node_正常的XML文档3(t *testing.T) {
     expect(t, "topo结构检查", true == elem3.NoChildren())
 }
 
-func Test_Node_修改文档1(t *testing.T) {
+func Test_Node_修改文档_节点层次的增删改(t *testing.T) {
     doc, err := tinydom.LoadDocument(strings.NewReader("<node><elem1></elem1><elem2></elem2><elem3></elem3></node>"))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
@@ -562,7 +570,7 @@ func Test_Handle_基本功能测试(t *testing.T) {
     expect(t, "周游测试", nil != handle.FirstChildElement("node").PreviousSibling().ToDirective())
 }
 
-func Test_Node_修改文档2(t *testing.T) {
+func Test_Node_修改文档_对新添加的节点进行修改(t *testing.T) {
     doc, err := tinydom.LoadDocument(strings.NewReader("<node><elem1/></node>"))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
@@ -575,10 +583,19 @@ func Test_Node_修改文档2(t *testing.T) {
     node.InsertEndChild(elem1)
 }
 
-func Test_Handle_基本功能测试2(t *testing.T) {
+func Test_Handle_基本功能测试_Parent(t *testing.T) {
     xml := `<node attr1="value1" attr2="value2"></node>`
     doc, err := tinydom.LoadDocument(strings.NewReader(xml))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
     expect(t, "返回值检测", nil != doc.FirstChild().Parent().ToDocument())
+}
+
+func Test_TODO_Document_通过修改文档破坏xml文档的有效性(t *testing.T) {
+}
+
+func Test_TODO_Document_各种dom树输出(t *testing.T) {
+}
+
+func Test_TODO_Node_将另外一个文档的node添加到本文档(t *testing.T) {
 }
