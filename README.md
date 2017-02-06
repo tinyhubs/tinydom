@@ -3,7 +3,6 @@
 tinydom是一个非验证的，轻量级的，经过充分测试的go语言(golang)xml流的dom构造器。
 
 # tinydom简介
-tinydom	是一个简单的非验证的XML的DOM构造工具.
 
 tidydom使用golang的encoding/xml标准库作为底层XML文本流的解析器。使用tinydom提供的接口可以实现简单的XML文件的读取和生成。
 tinydom借鉴了[tinyxml2](http://www.grinninglizard.com/tinyxml2/index.html)的接口设计技巧，提供了丰富的XML元素的查找手段。
@@ -22,7 +21,7 @@ tinydom借鉴了[tinyxml2](http://www.grinninglizard.com/tinyxml2/index.html)的
 - `XMLDirective`表示的是`<!`与`>`之间的部分，一般为DTD。
 - `XNLNode`是所有这些节点的共同基础，XMLNode提供了丰富的节点元素遍历手段。
 - `XMLVisitor`提供了一种XML对象的元素遍历机制。
-- `XMLHandle`的所用是简化代码编写工作，使用XMLHandle将减少很多判空代码(if nil == xxx {}),活用XMLHandle可以让我们的工作事半功倍，代码也更加健壮。
+- `XMLHandle`的作用是简化代码编写工作，使用XMLHandle将减少很多判空处理的代码(if nil == xxx {}),活用XMLHandle可以让我们的编码工作事半功倍，代码也更加健壮。
 
 ##  加载文档
 LoadDocument用于从一个文件流或者字符流读取XML数据，并构建出XMLDocument对象，一般用于读取XML文件的场景。
@@ -30,9 +29,9 @@ LoadDocument用于从一个文件流或者字符流读取XML数据，并构建�
   import "tinydom"
   doc, err := tinydom.LoadDocument(strings.NewReader(s))
 ```
-从文档中找到我们需要的元素：
-FirstChildElement、LastChildElement、PreviousSiblingElement、NextSiblingElement这些接口主要是为了方便查找XMLElement元素，
-大部分情况下我们建立XML文档的DMO模型就是为了对XMLElement进行访问。
+
+FirstChildElement、LastChildElement、PreviousSiblingElement、NextSiblingElement这几个函数，主要是为了方便查找XMLElement元素，
+大部分情况下我们建立XML文档的DOM模型就是为了对XMLElement进行访问。
 ```go
     xmlstr := `
     <books>
@@ -115,4 +114,5 @@ walk(doc)。
 ```
 
 ##  名字空间
+不支持：
 虽然golang标准库是能够正常处理名字空间的，但当前tinydom还无法正确处理xml的名字空间，所有带有名字空间前缀的节点或者属性都会被丢弃。后续计划将这块功能补齐。
