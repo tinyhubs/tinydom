@@ -1,12 +1,12 @@
 # tinydom
 
-go语言的xml流的dom解析器。
+tinydom是一个非验证的，轻量级的，经过充分测试的go语言(golang)xml流的dom构造器。
 
 # tinydom简介
-tinydom	实现了一个简单的非验证的XML的DOM构造器.
+tinydom	是一个简单的非验证的XML的DOM构造工具.
 
-tidydom使用golang的encoding/xml标准库作为底层XML解析器，实现对XML文件的解析。使用tinydom提供的接口可以实现简单的XML文件的读取和生成。
-tinydom借鉴了[tinyxml2](http://www.grinninglizard.com/tinyxml2/index.html)的接口设计技巧，提供了丰富的查找XML元素的查找手段。
+tidydom使用golang的encoding/xml标准库作为底层XML文本流的解析器。使用tinydom提供的接口可以实现简单的XML文件的读取和生成。
+tinydom借鉴了[tinyxml2](http://www.grinninglizard.com/tinyxml2/index.html)的接口设计技巧，提供了丰富的XML元素的查找手段。
 
 
 
@@ -22,7 +22,7 @@ tinydom借鉴了[tinyxml2](http://www.grinninglizard.com/tinyxml2/index.html)的
 - `XMLDirective`表示的是`<!`与`>`之间的部分，一般为DTD。
 - `XNLNode`是所有这些节点的共同基础，XMLNode提供了丰富的节点元素遍历手段。
 - `XMLVisitor`提供了一种XML对象的元素遍历机制。
-- `XMLHandle`的所用是简化代码编写工作，使用XMLHandle将减少很多判空代码(if nil == xxx {}),活用XMLHandle将会让XML文件的元素事半功倍。
+- `XMLHandle`的所用是简化代码编写工作，使用XMLHandle将减少很多判空代码(if nil == xxx {}),活用XMLHandle可以让我们的工作事半功倍，代码也更加健壮。
 
 ##  加载文档
 LoadDocument用于从一个文件流或者字符流读取XML数据，并构建出XMLDocument对象，一般用于读取XML文件的场景。
@@ -83,11 +83,10 @@ InsertEndChild、InsertFirstChild、InsertAfterChild、DeleteChildren、DeleteCh
 ```go
 walk(doc)。
 ```
-还有一个更好的替代方式是使用XMLVisitor接口对文档中的元素进行遍历，可参见代码中XMLHandle的接口定义。
+还有一个更好的替代方式是使用XMLVisitor接口对文档中的元素进行遍历，可参见代码中XMLVisitor的接口定义。
 
 ##  XML字符转义
-受益于go的xml库，tinydom也支持XML字符转义，使用tinydom在读写xml的数据的时候不需要关注XML转义字符，tinydom自动会处理好，可参考下面的例子。
-如果您需要自定义输出格式，那么文本雷荣时，需要通过xml.ExcapeText函数进行转义。
+受益于go的xml库，tinydom也支持XML字符转义，使用tinydom在读写xml的数据的时候不需要关注XML转义字符，tinydom自动会处理好，可参考下面的例子：
 ```go
     xmlstr :=
         `<talks>
@@ -101,7 +100,7 @@ walk(doc)。
 ```
 
 ##  CDATA
-只有XMLText对象才涉及到CDATA，可以通过XMLText，tinydom能够自动识别CDATA，但是将DOM对象序列化成字符串时，除非节点指定了CDATA属性，否则会直接转义。
+只有XMLText对象才涉及到CDATA，可以通过XMLText获取到CDATA对象的数据，tinydom能够自动识别CDATA，但是将DOM对象序列化成字符串时，除非节点指定了CDATA属性，否则会直接转义。
 ```go
 	xmlstr := `<content><![CDATA[<example>This is ok in cdata text</example>]]></content>`
 	doc, _ := tinydom.LoadDocument(strings.NewReader(xmlstr))
@@ -114,3 +113,6 @@ walk(doc)。
 	fmt.Println("\nSpecial as CDATA:")
 	doc.Accept(tinydom.NewSimplePrinter(os.Stdout))
 ```
+
+##  名字空间
+虽然golang标准库是能够正常处理名字空间的，但当前tinydom还无法正确处理xml的名字空间，所有带有名字空间前缀的节点或者属性都会被丢弃。后续计划将这块功能补齐。
