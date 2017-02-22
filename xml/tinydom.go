@@ -784,7 +784,7 @@ func LoadDocument(rd io.Reader) (XMLDocument, error) {
         case xml.CharData:
             charData := token.(xml.CharData)
             shortCharData := bytes.TrimSpace(charData)
-            if (nil != shortCharData) || len(shortCharData) > 0 {
+            if (nil != shortCharData) && (len(shortCharData) > 0) {
                 if doc == parent {
                     return nil, errors.New("Text should be in the element")
                 }
