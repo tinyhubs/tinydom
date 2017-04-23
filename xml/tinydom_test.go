@@ -1,11 +1,10 @@
-package tinydom_test
+package tinydom
 
 import (
     "fmt"
     "os"
     "strings"
     "testing"
-    "tinydom/xml"
     "bytes"
 )
 
@@ -26,7 +25,7 @@ func Test_example1(t *testing.T) {
 	</books>
 	`
 
-    doc, _ := tinydom.LoadDocument(strings.NewReader(xmlstr))
+    doc, _ := LoadDocument(strings.NewReader(xmlstr))
     elem1 := doc.FirstChildElement("books").FirstChildElement("book").FirstChildElement("name")
     fmt.Println(elem1.Text()) //	The Moon
 
@@ -35,7 +34,7 @@ func Test_example1(t *testing.T) {
 
 }
 
-func walk(m int, rootNode tinydom.XMLNode) {
+func walk(m int, rootNode XMLNode) {
     if nil == rootNode {
         return
     }
@@ -48,14 +47,14 @@ func walk(m int, rootNode tinydom.XMLNode) {
 }
 
 func Test_example2(t *testing.T) {
-    doc := tinydom.NewDocument()
-    doc.InsertEndChild(tinydom.NewProcInst(doc, "xml", `version="1.0" encoding="UTF-8"`))
-    books := doc.InsertEndChild(tinydom.NewElement(doc, "books"))
-    book := books.InsertEndChild(tinydom.NewElement(doc, "book"))
-    name := book.InsertEndChild(tinydom.NewElement(doc, "name"))
-    name.InsertEndChild(tinydom.NewText(doc, "The Moon"))
+    doc := NewDocument()
+    doc.InsertEndChild(NewProcInst(doc, "xml", `version="1.0" encoding="UTF-8"`))
+    books := doc.InsertEndChild(NewElement(doc, "books"))
+    book := books.InsertEndChild(NewElement(doc, "book"))
+    name := book.InsertEndChild(NewElement(doc, "name"))
+    name.InsertEndChild(NewText(doc, "The Moon"))
 
-    doc.Accept(tinydom.NewSimplePrinter(os.Stdout))
+    doc.Accept(NewSimplePrinter(os.Stdout))
 
     fmt.Println()
 
@@ -69,44 +68,44 @@ func Test_example3(t *testing.T) { //Me
             <talk from="tom" to="bill">yes, that is right</talk>
          </talks>
         `
-    doc, _ := tinydom.LoadDocument(strings.NewReader(xmlstr))
+    doc, _ := LoadDocument(strings.NewReader(xmlstr))
     talk := doc.FirstChildElement("talks").FirstChildElement("talk").Text()
     fmt.Print(talk)
 }
 
 func Test_example4(t *testing.T) {
     xmlstr := `<content><![CDATA[<example>This is ok in cdata text</example>]]></content>`
-    doc, _ := tinydom.LoadDocument(strings.NewReader(xmlstr))
+    doc, _ := LoadDocument(strings.NewReader(xmlstr))
     content := doc.FirstChildElement("content")
     fmt.Println("\nRead CDATA:", content.Text())
     fmt.Println("\nNormal Print:")
-    doc.Accept(tinydom.NewSimplePrinter(os.Stdout))
+    doc.Accept(NewSimplePrinter(os.Stdout))
     text := content.FirstChild().ToText()
     text.SetCDATA(true)
     fmt.Println("\nSpecial as CDATA:")
-    doc.Accept(tinydom.NewSimplePrinter(os.Stdout))
+    doc.Accept(NewSimplePrinter(os.Stdout))
 }
 
 func Test_Document_空文档_加载失败(t *testing.T) {
-    doc, err := tinydom.LoadDocument(strings.NewReader(""))
+    doc, err := LoadDocument(strings.NewReader(""))
     expect(t, "返回值检测", nil == doc)
     expect(t, "返回值检测", nil != err)
 }
 
 func Test_Document_格式错误_节点未关闭(t *testing.T) {
-    doc, err := tinydom.LoadDocument(strings.NewReader("<node><elem></node>"))
+    doc, err := LoadDocument(strings.NewReader("<node><elem></node>"))
     expect(t, "返回值检测", nil == doc)
     expect(t, "返回值检测", nil != err)
 }
 
 func Test_Document_格式错误_关闭节点多余(t *testing.T) {
-    doc, err := tinydom.LoadDocument(strings.NewReader("<node><elem></elem></elem></node>"))
+    doc, err := LoadDocument(strings.NewReader("<node><elem></elem></elem></node>"))
     expect(t, "返回值检测", nil == doc)
     expect(t, "返回值检测", nil != err)
 }
 
 func Test_Document_格式错误_多余的节点(t *testing.T) {
-    doc, err := tinydom.LoadDocument(strings.NewReader("<node><elem></elem></node><hello/>"))
+    doc, err := LoadDocument(strings.NewReader("<node><elem></elem></node><hello/>"))
     expect(t, "返回值检测", nil == doc)
     expect(t, "返回值检测", nil != err)
 }
@@ -116,22 +115,22 @@ func Test_Document_输出_各种元素遍历(t *testing.T) {
 	<!--comment1-->
 	<!DOCTYPE poem>
 	<node attr1="value1" attr2="value2"><elem><!--comment2--></elem><str>Hello world</str><hello/></node>`
-    doc, err := tinydom.LoadDocument(strings.NewReader(xml))
-    doc.Accept(tinydom.NewSimplePrinter(os.Stdout))
+    doc, err := LoadDocument(strings.NewReader(xml))
+    doc.Accept(NewSimplePrinter(os.Stdout))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
 
     result := `<?xml version="1.0" encoding="UTF-8"?>` + "\n" +
         `<!--comment1--><!DOCTYPE poem><node attr1="value1" attr2="value2"><elem><!--comment2--></elem><str>Hello world</str><hello/></node>`
     buf := bytes.NewBufferString("")
-    doc.Accept(tinydom.NewSimplePrinter(buf))
+    doc.Accept(NewSimplePrinter(buf))
     fmt.Println("=========")
     fmt.Println(buf)
     expect(t, "检查输出", result == buf.String())
 }
 
 func Test_Node_正常的XML文档_特殊场景_只有一个根节点(t *testing.T) {
-    doc, err := tinydom.LoadDocument(strings.NewReader("<node></node>"))
+    doc, err := LoadDocument(strings.NewReader("<node></node>"))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
 
@@ -160,7 +159,7 @@ func Test_Node_正常的XML文档_特殊场景_只有一个根节点(t *testing.
 }
 
 func Test_Node_正常的XML文档_特殊场景_只有一个子节点(t *testing.T) {
-    doc, err := tinydom.LoadDocument(strings.NewReader("<node><elem></elem></node>"))
+    doc, err := LoadDocument(strings.NewReader("<node><elem></elem></node>"))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
 
@@ -206,7 +205,7 @@ func Test_Node_正常的XML文档_特殊场景_只有一个子节点(t *testing.
 }
 
 func Test_Node_正常的XML文档_丰富的文档结构(t *testing.T) {
-    doc, err := tinydom.LoadDocument(strings.NewReader("<node><elem1></elem1><elem2></elem2><elem3></elem3></node>"))
+    doc, err := LoadDocument(strings.NewReader("<node><elem1></elem1><elem2></elem2><elem3></elem3></node>"))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
 
@@ -243,7 +242,7 @@ func Test_Node_正常的XML文档_丰富的文档结构(t *testing.T) {
 }
 
 func Test_Node_修改文档_节点层次的增删改(t *testing.T) {
-    doc, err := tinydom.LoadDocument(strings.NewReader("<node><elem1></elem1><elem2></elem2><elem3></elem3></node>"))
+    doc, err := LoadDocument(strings.NewReader("<node><elem1></elem1><elem2></elem2><elem3></elem3></node>"))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
 
@@ -251,10 +250,10 @@ func Test_Node_修改文档_节点层次的增删改(t *testing.T) {
     elem1 := node.FirstChildElement("elem1")
     elem2 := node.FirstChildElement("elem2")
 
-    new1 := elem1.InsertEndChild(tinydom.NewElement(doc, "new1"))
-    new2 := node.InsertEndChild(tinydom.NewElement(doc, "new2"))
-    new3 := node.InsertAfterChild(elem2, tinydom.NewElement(doc, "new3"))
-    new4 := elem1.InsertFirstChild(tinydom.NewElement(doc, "new4"))
+    new1 := elem1.InsertEndChild(NewElement(doc, "new1"))
+    new2 := node.InsertEndChild(NewElement(doc, "new2"))
+    new3 := node.InsertAfterChild(elem2, NewElement(doc, "new3"))
+    new4 := elem1.InsertFirstChild(NewElement(doc, "new4"))
     expect(t, "添加成功", nil != new1)
     expect(t, "添加成功", nil != new2)
     expect(t, "添加成功", nil != new3)
@@ -271,13 +270,13 @@ func Test_Node_修改文档_节点层次的增删改(t *testing.T) {
 }
 
 func Test_Element_属性同名错误(t *testing.T) {
-    doc, err := tinydom.LoadDocument(strings.NewReader(`<node attr="value1" attr="value2"></node>`))
+    doc, err := LoadDocument(strings.NewReader(`<node attr="value1" attr="value2"></node>`))
     expect(t, "返回值检测", nil == doc)
     expect(t, "返回值检测", nil != err)
 }
 
 func Test_Element_属性基本功能(t *testing.T) {
-    doc, err := tinydom.LoadDocument(strings.NewReader(`<node attr1="value1" attr2="value2"></node>`))
+    doc, err := LoadDocument(strings.NewReader(`<node attr1="value1" attr2="value2"></node>`))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
 
@@ -300,7 +299,7 @@ func Test_Element_属性基本功能(t *testing.T) {
 
     //  enum
     hitCount := 0
-    node.ForeachAttribute(func(attribute tinydom.XMLAttribute) int {
+    node.ForeachAttribute(func(attribute XMLAttribute) int {
 
         if "attr1" == attribute.Name() {
             expect(t, "检查元素值", "(modified1)" == attribute.Value())
@@ -320,7 +319,7 @@ func Test_Element_属性基本功能(t *testing.T) {
 
     //  return vaue of callback
     hitCount = 0
-    retult := node.ForeachAttribute(func(attribute tinydom.XMLAttribute) int {
+    retult := node.ForeachAttribute(func(attribute XMLAttribute) int {
         if "attr1" == attribute.Name() {
             expect(t, "检查元素值", "(modified1)" == attribute.Value())
             hitCount++
@@ -343,7 +342,7 @@ func Test_Element_属性基本功能(t *testing.T) {
     expect(t, "清除所有属性之后", "(default1)" == node.Attribute("attr1", "(default1)"))
     expect(t, "清除所有属性之后", "(default2)" == node.Attribute("attr2", "(default2)"))
     expect(t, "清除所有属性之后", "(default3)" == node.Attribute("attr3", "(default3)"))
-    expect(t, "遍历空属性列表总是返回0", 0 == node.ForeachAttribute(func(attribute tinydom.XMLAttribute) int {
+    expect(t, "遍历空属性列表总是返回0", 0 == node.ForeachAttribute(func(attribute XMLAttribute) int {
         return 11
     }))
     expect(t, "在空属性列表中查找，总是返回nil", nil == node.FindAttribute("attr1"))
@@ -359,7 +358,7 @@ func Test_ProcInst_基本功能测试(t *testing.T) {
     xml := `<?xml version="1.0" encoding="UTF-8"?>
     <node attr1="value1" attr2="value2"></node>
     `
-    doc, err := tinydom.LoadDocument(strings.NewReader(xml))
+    doc, err := LoadDocument(strings.NewReader(xml))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
 
@@ -381,7 +380,7 @@ func Test_Comment_基本功能测试(t *testing.T) {
     xml := `<!--comment1--><node><elem1><!--comment2--></elem1></node>`
 
     //  加载
-    doc, err := tinydom.LoadDocument(strings.NewReader(xml))
+    doc, err := LoadDocument(strings.NewReader(xml))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
 
@@ -404,7 +403,7 @@ func Test_Comment_基本功能测试(t *testing.T) {
     expect(t, "修改注释内容", "New\nComment" == comment1.Comment())
 
     //  添加注释
-    comment3 := tinydom.NewComment(doc, "Comment3")
+    comment3 := NewComment(doc, "Comment3")
     doc.FirstChildElement("").InsertEndChild(comment3)
     expect(t, "向文档添加注释", "Comment3" == doc.FirstChildElement("").LastChild().Value())
 }
@@ -412,14 +411,14 @@ func Test_Comment_基本功能测试(t *testing.T) {
 func Test_Comment_含有错误注释的XML流(t *testing.T) {
     xml := `<node><elem1><!--comment2</elem1>--></node>
     `
-    doc, err := tinydom.LoadDocument(strings.NewReader(xml))
+    doc, err := LoadDocument(strings.NewReader(xml))
     expect(t, "返回值检测", nil == doc)
     expect(t, "返回值检测", nil != err)
 }
 
 func Test_Text_基本功能测试(t *testing.T) {
     xml := "<node>text1<elem1>text2</elem1>\ttext3\n<elem2>\t\n      </elem2></node>"
-    doc, err := tinydom.LoadDocument(strings.NewReader(xml))
+    doc, err := LoadDocument(strings.NewReader(xml))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
 
@@ -471,7 +470,7 @@ func Test_Text_基本功能测试(t *testing.T) {
 
 func Test_Text_Text出现在跟节点之外(t *testing.T) {
     xml := `<node></node>texterror`
-    doc, err := tinydom.LoadDocument(strings.NewReader(xml))
+    doc, err := LoadDocument(strings.NewReader(xml))
     expect(t, "返回值检测", nil == doc)
     expect(t, "返回值检测", nil != err)
 }
@@ -496,7 +495,7 @@ func Test_Directive_基本功能测试(t *testing.T) {
         <content>空山不见人，但闻人语声。返景入深林，复照青苔上。</content>
     </poem>
     `
-    doc, err := tinydom.LoadDocument(strings.NewReader(xml))
+    doc, err := LoadDocument(strings.NewReader(xml))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
 
@@ -519,7 +518,7 @@ func Test_Directive_基本功能测试(t *testing.T) {
 }
 
 func Test_Handle_空腹测试(t *testing.T) {
-    handle := tinydom.NewHandle(nil)
+    handle := NewHandle(nil)
     expect(t, "空转换测试", nil == handle.ToDirective())
     expect(t, "空转换测试", nil == handle.ToText())
     expect(t, "空转换测试", nil == handle.ToComment())
@@ -547,11 +546,11 @@ func Test_Handle_基本功能测试(t *testing.T) {
         <!ELEMENT content (#PCDATA)>
     	]>
 	<node attr1="value1" attr2="value2"><elem><!--comment2--></elem><elem>126</elem><str>Hello world</str></node>`
-    doc, err := tinydom.LoadDocument(strings.NewReader(xml))
+    doc, err := LoadDocument(strings.NewReader(xml))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
 
-    handle := tinydom.NewHandle(doc)
+    handle := NewHandle(doc)
     expect(t, "周游测试", nil != handle.ToDocument())
     expect(t, "周游测试", "xml" == handle.FirstChild().ToProcInst().Value())
     expect(t, "周游测试", "comment1" == handle.FirstChild().NextSibling().ToComment().Value())
@@ -571,7 +570,7 @@ func Test_Handle_基本功能测试(t *testing.T) {
 }
 
 func Test_Node_修改文档_对新添加的节点进行修改(t *testing.T) {
-    doc, err := tinydom.LoadDocument(strings.NewReader("<node><elem1/></node>"))
+    doc, err := LoadDocument(strings.NewReader("<node><elem1/></node>"))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
 
@@ -585,7 +584,7 @@ func Test_Node_修改文档_对新添加的节点进行修改(t *testing.T) {
 
 func Test_Handle_基本功能测试_Parent(t *testing.T) {
     xml := `<node attr1="value1" attr2="value2"></node>`
-    doc, err := tinydom.LoadDocument(strings.NewReader(xml))
+    doc, err := LoadDocument(strings.NewReader(xml))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
     expect(t, "返回值检测", nil != doc.FirstChild().Parent().ToDocument())
