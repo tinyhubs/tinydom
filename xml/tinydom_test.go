@@ -10,7 +10,7 @@ import (
 
 func expect(t *testing.T, message string, result bool) {
     if result {
-        fmt.Println(message)
+        //fmt.Println(message)
         return
     }
 
