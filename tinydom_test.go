@@ -119,14 +119,14 @@ func Test_Document_输出_各种元素遍历(t *testing.T) {
     doc.Accept(NewSimplePrinter(os.Stdout))
     expect(t, "返回值检测", nil != doc)
     expect(t, "返回值检测", nil == err)
-
-    result := `<?xml version="1.0" encoding="UTF-8"?>` + "\n" +
+    
+    result1 := `<?xml version="1.0" encoding="UTF-8"?>` + "\n" +
         `<!--comment1--><!DOCTYPE poem><node attr1="value1" attr2="value2"><elem><!--comment2--></elem><str>Hello world</str><hello/></node>`
+    result2 := `<?xml version="1.0" encoding="UTF-8"?>` + "\n" +
+        `<!--comment1--><!DOCTYPE poem><node attr2="value2" attr1="value1"><elem><!--comment2--></elem><str>Hello world</str><hello/></node>`
     buf := bytes.NewBufferString("")
     doc.Accept(NewSimplePrinter(buf))
-    fmt.Println("=========")
-    fmt.Println(buf)
-    expect(t, "检查输出", result == buf.String())
+    expect(t, "检查输出", (result1 == buf.String()) || (result2 == buf.String()))
 }
 
 func Test_Node_正常的XML文档_特殊场景_只有一个根节点(t *testing.T) {
