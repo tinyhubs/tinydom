@@ -107,14 +107,20 @@ InsertEndChild、InsertFirstChild、InsertAfterChild、DeleteChildren、DeleteCh
 
 `XMLElement`接口提供了多个属性的函数:
 
-  * 查找: `FindAttribute(name string) XMLAttribute`
-  * 遍历: `ForeachAttribute(callback func(attribute XMLAttribute) int) int`
+查找: `FindAttribute(name string) XMLAttribute`
 
-  * 属性个数统计: `AttributeCount() int`
-  * 直接获取属性字符串: `Attribute(name string, def string) string`
-  * 新增属性或者修改属性值: `SetAttribute(name string, value string) XMLAttribute`
-  * 删除属性: `DeleteAttribute(name string) XMLAttribute`
-  * 删除所有属性: `ClearAttributes()`
+遍历: `ForeachAttribute(callback func(attribute XMLAttribute) int) int`
+
+属性个数统计: `AttributeCount() int`
+
+直接获取属性字符串: `Attribute(name string, def string) string`
+
+新增属性或者修改属性值: `SetAttribute(name string, value string) XMLAttribute`
+
+删除属性: `DeleteAttribute(name string) XMLAttribute`
+
+删除所有属性: `ClearAttributes()`
+
 
 
 ##  文档的遍历
