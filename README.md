@@ -67,6 +67,56 @@ InsertEndChild、InsertFirstChild、InsertAfterChild、DeleteChildren、DeleteCh
     doc.Accept(tinydom.NewSimplePrinter(os.Stdout))
 ```
 
+##  查找节点
+
+- 获取子节点
+
+`FirstChild`、`LastChild`这两个函数用于获取某个节点的子节点,不管节点是什么类型都可以用这两个函数获取到.
+
+`FirstChildElement`、`LastChildElement`这两个函数专用于查找指定的Element节点,如果指定了name参数,
+那么只查找指定名字的子Element节点.
+
+- 获取相邻节点
+
+`PreviousSibling`、`NextSibling`这两个函数用于查找当前节点的前一个或者后一个兄弟节点.
+
+`PreviousSiblingElement`、`NextSiblingElement`这两个函数用于查找当前节点的上一个或者下一个Element节点.
+我们同样可以通过指定这两个函数的name参数来查找执行名字的Element节点.
+
+- 获取父节点
+
+`Parent`函数直接获取当前节点的父节点.
+
+- 节点类型转换
+
+我们提供了一堆的转换函数:
+
+`ToElement() XMLElement`
+
+`ToText() XMLText`
+
+`ToComment() XMLComment`
+
+`ToDocument() XMLDocument`
+
+`ToProcInst() XMLProcInst`
+
+`ToDirective() XMLDirective`
+
+- 获取节点属性
+
+`XMLElement`接口提供了多个属性的函数:
+
+  * 查找: `FindAttribute(name string) XMLAttribute`
+  * 遍历: `ForeachAttribute(callback func(attribute XMLAttribute) int) int`
+  
+  * 属性个数统计: `AttributeCount() int`
+  * 直接获取属性字符串: `Attribute(name string, def string) string`
+  * 新增属性或者修改属性值: `SetAttribute(name string, value string) XMLAttribute`
+  * 删除属性: `DeleteAttribute(name string) XMLAttribute`
+  * 删除所有属性: `ClearAttributes()`
+
+
 ##  文档的遍历
 `Parent`、`FirstChild`、`LastChild`、`PreviousSibling`、`NextSibling`用于使我们可以方便地在XML的DOM树中游走。
 下面这个函数可以用于对一个doc进行遍历：
