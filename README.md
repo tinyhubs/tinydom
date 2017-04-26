@@ -109,7 +109,7 @@ InsertEndChild、InsertFirstChild、InsertAfterChild、DeleteChildren、DeleteCh
 
   * 查找: `FindAttribute(name string) XMLAttribute`
   * 遍历: `ForeachAttribute(callback func(attribute XMLAttribute) int) int`
-  
+
   * 属性个数统计: `AttributeCount() int`
   * 直接获取属性字符串: `Attribute(name string, def string) string`
   * 新增属性或者修改属性值: `SetAttribute(name string, value string) XMLAttribute`
