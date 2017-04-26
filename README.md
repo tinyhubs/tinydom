@@ -49,23 +49,6 @@ FirstChildElement、LastChildElement、PreviousSiblingElement、NextSiblingEleme
     fmt.Println(elem2.Text()) //	Suny
 ```
 
-##  新建文档
-NewDocument用于在内存中生成DOM，一般用于生成XML文件。
-InsertEndChild、InsertFirstChild、InsertAfterChild、DeleteChildren、DeleteChild用于对XMLDocument进行修改。
-下面的代码创建了一个XML文档：
-```go
-    doc := tinydom.NewDocument()
-    books := doc.InsertEndChild(tinydom.NewElement(doc, "books"))
-    book := books.InsertEndChild(tinydom.NewElement(doc, "book"))
-    name := book.InsertEndChild(tinydom.NewElement(doc, "name"))
-    name.InsertEndChild(tinydom.NewText(doc, "The Moon"))
-    doc.InsertEndChild(tinydom.NewProcInst(doc, "xml", `version="1.0" encoding="UTF-8"`))
-```
-
-我们可以使用XMLDocument.Accept方法来将这个XML文档输出：
-```go
-    doc.Accept(tinydom.NewSimplePrinter(os.Stdout))
-```
 
 ##  查找节点
 
@@ -143,6 +126,51 @@ walk(doc)。
 ```
 还有一个更好的替代方式是使用XMLVisitor接口对文档中的元素进行遍历，可参见代码中XMLVisitor的接口定义。
 
+##  新建文档
+NewDocument用于在内存中生成DOM，一般用于生成XML文件。
+
+tinydom提供了一系列的NewXXX方法用于创建各种不同类型的节点:
+
+`tinydom.NewText(document XMLDocument, text string) XMLText`
+
+`tinydom.NewComment(document XMLDocument, comment string) XMLComment`
+
+`tinydom.NewElement(document XMLDocument, name string) XMLElement`
+
+`tinydom.NewProcInst(document XMLDocument, target string, inst string) XMLProcInst`
+
+`tinydom.NewDirective(document XMLDocument, directive string) XMLDirective`
+
+而下面这些函数用于将任意类型的节点加入当前节点,或者对节点进行删除操作:
+
+- 将node添加为本节点的最后一个子节点(最常用):`tinydom.InsertEndChild(node XMLNode) XMLNode`
+
+- 将node添加为本节点的第一个子节点:`tinydom.InsertFirstChild(node XMLNode) XMLNode`
+
+- 将addThis添加到本节点的子节点afterThis的前面:`tinydom.InsertAfterChild(afterThis XMLNode, addThis XMLNode) XMLNode`
+
+- 删除所有的子节点:`tinydom.DeleteChildren()``
+
+- 删除本节点的node子节点:`tinydom.DeleteChild(node XMLNode)``
+
+
+
+
+下面的代码创建了一个XML文档：
+```go
+    doc := tinydom.NewDocument()
+    books := doc.InsertEndChild(tinydom.NewElement(doc, "books"))
+    book := books.InsertEndChild(tinydom.NewElement(doc, "book"))
+    name := book.InsertEndChild(tinydom.NewElement(doc, "name"))
+    name.InsertEndChild(tinydom.NewText(doc, "The Moon"))
+    doc.InsertEndChild(tinydom.NewProcInst(doc, "xml", `version="1.0" encoding="UTF-8"`))
+```
+
+我们可以使用XMLDocument.Accept方法来将这个XML文档输出：
+```go
+    doc.Accept(tinydom.NewSimplePrinter(os.Stdout))
+```
+
 ##  XML字符转义
 受益于go的xml库，tinydom也支持XML字符转义，使用tinydom在读写xml的数据的时候不需要关注XML转义字符，tinydom自动会处理好，可参考下面的例子：
 ```go
@@ -156,6 +184,7 @@ walk(doc)。
     talk := doc.FirstChildElement("talks").FirstChildElement("talk").Text()
     fmt.Print(talk) //  [&'"><] are the xml escape chars?
 ```
+
 
 ##  CDATA
 只有XMLText对象才涉及到CDATA，可以通过XMLText获取到CDATA对象的数据，tinydom能够自动识别CDATA，但是将DOM对象序列化成字符串时，除非节点指定了CDATA属性，否则会直接转义。
