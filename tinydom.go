@@ -1095,6 +1095,8 @@ func isInCharacterRange(r rune) (inrange bool) {
 //  &       no     no     &amp;
 //  <       no     no     &lt;
 //  "       no     yes    &quot;
+//  \n      no     yes    &#xA;
+//  \r      no     yes    &#xD;
 //  '       yes    yes    &apos;
 //  >       yes    yes    &gt;
 var (
