@@ -1101,6 +1101,8 @@ var (
     esc_amp  = []byte("&amp;")
     esc_lt   = []byte("&lt;")
     esc_quot = []byte("&quot;")
+    esc_nl   = []byte("&#xA;")
+    esc_cr   = []byte("&#xD;")
     esc_fffd = []byte("\uFFFD") // Unicode replacement character
 )
 
@@ -1117,6 +1119,10 @@ func EscapeAttribute(w io.Writer, s []byte) error {
             esc = esc_lt
         case '"':
             esc = esc_quot
+        case '\n':
+            esc = esc_nl
+        case '\r':
+            esc = esc_cr
         default:
             if !isInCharacterRange(r) || (r == 0xFFFD && width == 1) {
                 esc = esc_fffd
