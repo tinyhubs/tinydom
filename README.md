@@ -171,6 +171,35 @@ tinydom提供了一系列的NewXXX方法用于创建各种不同类型的节点:
     doc.Accept(tinydom.NewSimplePrinter(os.Stdout))
 ```
 
+##  输出
+
+tinydom采用了访问者模式(参见`XMLVisitor`接口)来对文档的所有节点进行遍历,`tinydom.XMLVisitor`和`tinydom.XMLDocument`的
+`Accept`方法结合基本可以输出满足我们大多数场景的XML文档输出任务.我们完全可以使用该机制自己定制文档输出格式.
+
+不过,为了方便大多数使用场景,tinydom仍然提供了一个专用于打印的visitor.下面这行代码用于直接向屏幕打印XML文档:
+```go
+doc.Accept(tinydom.NewSimplePrinter(os.Stdout, tinydom.PrettyPrint))
+```
+
+`tinydom.NewSimplePrinter`的接口如下:
+```go
+func NewSimplePrinter(writer io.Writer, options PrintOptions) XMLVisitor
+```
+
+`tinydom.NewSimplePrinter`的第二个参数用于控制输出格式:
+
+```go
+type PrintOptions struct {
+    Indent        []byte //  缩进前缀,只允许填写tab或者空白,如果Indent长度为0表示折行但是不缩进,如果Indent为null表示不折行
+    TextWrapWidth int    //  超过多长才强制换行
+}
+```
+
+为简化编码tinydom也提供了两种缺省的`PrintOptions`:
+
+- `PrettyPrint` 优美打印: 节点输出自动折行,并按4个空格缩进
+- `StreamPrint` 流式打印: 节点输出不带换行,除非Text部分有换行
+
 ##  XML字符转义
 受益于go的xml库，tinydom也支持XML字符转义，使用tinydom在读写xml的数据的时候不需要关注XML转义字符，tinydom自动会处理好，可参考下面的例子：
 ```go
