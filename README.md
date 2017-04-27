@@ -198,6 +198,11 @@ type PrintOptions struct {
 - `PrettyPrint` 优美打印: 节点输出自动折行,并按4个空格缩进
 - `StreamPrint` 流式打印: 节点输出不带换行,除非Text部分有换行
 
+对于自定义XML文档格式化而言,处理XML字符转义是个麻烦,因为你必须处理一些细节.但tinydom也可在这方面帮助你,tinydom提供了
+`tinydom.EscapeAttribute`和`tinydom.EscapeText`来方便处理属性和`XMLText`中的转义字符.您也可以使用golang自带
+的`xml.EscapeText`,只是这个函数做了更多的转义,会导致文档更难阅读和编辑.
+
+
 ##  XML字符转义
 受益于go的xml库，tinydom也支持XML字符转义，使用tinydom在读写xml的数据的时候不需要关注XML转义字符，tinydom自动会处理好，可参考下面的例子：
 ```go
@@ -212,6 +217,7 @@ type PrintOptions struct {
     fmt.Print(talk) //  [&'"><] are the xml escape chars?
 ```
 
+xml文档输出时,可使用`tinydom.EscapeAttribute`和`tinydom.EscapeText`来对字符进行转义.
 
 ##  CDATA
 只有XMLText对象才涉及到CDATA，可以通过XMLText获取到CDATA对象的数据，tinydom能够自动识别CDATA，但是将DOM对象序列化成字符串时，除非节点指定了CDATA属性，否则会直接转义。
