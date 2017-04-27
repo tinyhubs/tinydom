@@ -168,7 +168,7 @@ tinydom提供了一系列的NewXXX方法用于创建各种不同类型的节点:
 
 我们可以使用XMLDocument.Accept方法来将这个XML文档输出：
 ```go
-    doc.Accept(tinydom.NewSimplePrinter(os.Stdout))
+    doc.Accept(tinydom.NewSimplePrinter(os.Stdout, tinydom.PrettyPrint))
 ```
 
 ##  输出
