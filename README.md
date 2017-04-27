@@ -17,23 +17,23 @@ tinydom借鉴了[tinyxml2](http://www.grinninglizard.com/tinyxml2/index.html)的
 一个XML文档由`XMLDocument`、`XMLElement`、`XMLText`、`XMLComment`、`XMLProcInst`、`XMLDirective`者几种类型的节点组成。
 
 - `XMLDocument`是一个XML文档的根节点。
-- `XMLElement`是XML文档的基本节点元素，一个XMLElement可以含有多个XMLAttribute。
+- `XMLElement`是XML文档的基本节点元素，一个`XMLElement`可以含有多个`XMLAttribute`。
 - `XMLText`是XML的文本元素，支持CDATA和XML字符转义。
 - `XMLComment`表示的是XML的注释，是`<!--` 与 `-->`之间的部分。
 - `XMLProcInst`表示的是`<?`与`?>`之间的部分，一般出现在xml文档的声明部分。
 - `XMLDirective`表示的是`<!`与`>`之间的部分，一般为DTD。
 - `XNLNode`是所有这些节点的共同基础，XMLNode提供了丰富的节点元素遍历手段。
 - `XMLVisitor`提供了一种XML对象的元素遍历机制。
-- `XMLHandle`的作用是简化代码编写工作，使用XMLHandle将减少很多判空处理的代码(if nil == xxx {}),活用XMLHandle可以让我们的编码工作事半功倍，代码也更加健壮。
+- `XMLHandle`的作用是简化代码编写工作，使用`XMLHandle`将减少很多判空处理的代码(if nil == xxx {}),活用`XMLHandle`可以让我们的编码工作事半功倍，代码也更加健壮。
 
 ##  加载文档
-LoadDocument用于从一个文件流或者字符流读取XML数据，并构建出XMLDocument对象，一般用于读取XML文件的场景。
+`tinydom.LoadDocument`用于从一个文件流或者字符流读取XML数据，并构建出`tinydom.XMLDocument`对象，一般用于读取XML文件的场景。
 ```go
   import "tinydom"
   doc, err := tinydom.LoadDocument(strings.NewReader(s))
 ```
 
-FirstChildElement、LastChildElement、PreviousSiblingElement、NextSiblingElement这几个函数，主要是为了方便查找XMLElement元素，
+`FirstChildElement`、`LastChildElement`、`PreviousSiblingElement`、`NextSiblingElement`这几个函数，主要是为了方便查找`XMLElement`元素，
 大部分情况下我们建立XML文档的DOM模型就是为了对XMLElement进行访问。
 ```go
     xmlstr := `
@@ -113,14 +113,15 @@ FirstChildElement、LastChildElement、PreviousSiblingElement、NextSiblingEleme
         }
     }
 ```
+
 您可以这样调用：
 ```go
 walk(doc)。
 ```
-还有一个更好的替代方式是使用XMLVisitor接口对文档中的元素进行遍历，可参见代码中XMLVisitor的接口定义。
+还有一个更好的替代方式是使用`tinydom.XMLVisitor`接口对文档中的元素进行遍历，可参见代码中`tinydom.XMLVisitor`的接口定义。
 
 ##  新建文档
-NewDocument用于在内存中生成DOM，一般用于生成XML文件。
+`tinydom.NewDocument`用于在内存中生成DOM，一般用于生成XML文件。
 
 tinydom提供了一系列的NewXXX方法用于创建各种不同类型的节点:
 
@@ -142,9 +143,9 @@ tinydom提供了一系列的NewXXX方法用于创建各种不同类型的节点:
 
 - 将addThis添加到本节点的子节点afterThis的前面:`tinydom.InsertAfterChild(afterThis XMLNode, addThis XMLNode) XMLNode`
 
-- 删除所有的子节点:`tinydom.DeleteChildren()``
+- 删除所有的子节点:`tinydom.DeleteChildren()`
 
-- 删除本节点的node子节点:`tinydom.DeleteChild(node XMLNode)``
+- 删除本节点的node子节点:`tinydom.DeleteChild(node XMLNode)`
 
 我们也可以对节点的属性进行操作:
 
@@ -164,17 +165,18 @@ tinydom提供了一系列的NewXXX方法用于创建各种不同类型的节点:
     doc.InsertEndChild(tinydom.NewProcInst(doc, "xml", `version="1.0" encoding="UTF-8"`))
 ```
 
-我们可以使用`XMLDocument`的`Accept`方法来将这个XML文档输出：
+我们可以使用`tinydom.XMLDocument`的`Accept`方法来将这个XML文档输出：
 ```go
     doc.Accept(tinydom.NewSimplePrinter(os.Stdout, tinydom.PrettyPrint))
 ```
 
 ##  输出
 
-tinydom采用了访问者模式(参见`XMLVisitor`接口)来对文档的所有节点进行遍历,`tinydom.XMLVisitor`和`tinydom.XMLDocument`的
+tinydom采用了访问者模式(参见`tinydom.XMLVisitor`接口)来对文档的所有节点进行遍历,`tinydom.XMLVisitor`和`tinydom.XMLDocument`的
 `Accept`方法结合基本可以输出满足我们大多数场景的XML文档输出任务.我们完全可以使用该机制自己定制文档输出格式.
 
 不过,为了方便大多数使用场景,tinydom仍然提供了一个专用于打印的visitor.下面这行代码用于直接向屏幕打印XML文档:
+
 ```go
 doc.Accept(tinydom.NewSimplePrinter(os.Stdout, tinydom.PrettyPrint))
 ```
@@ -195,8 +197,8 @@ type PrintOptions struct {
 
 为简化编码tinydom也提供了两种缺省的`PrintOptions`:
 
-- `PrettyPrint` 优美打印: 节点输出自动折行,并按4个空格缩进
-- `StreamPrint` 流式打印: 节点输出不带换行,除非Text部分有换行
+- `tinydom.PrettyPrint` 优美打印: 节点输出自动折行,并按4个空格缩进
+- `tinydom.StreamPrint` 流式打印: 节点输出不带换行,除非Text部分有换行
 
 对于自定义XML文档输出模式而言,处理XML字符转义是个麻烦,因为你必须处理一些细节.但tinydom也可在这方面帮助你.tinydom提供了
 `tinydom.EscapeAttribute`和`tinydom.EscapeText`来方便处理属性和`XMLText`中的转义字符.您也可以使用golang自带
