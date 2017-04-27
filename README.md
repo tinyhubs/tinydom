@@ -164,7 +164,7 @@ tinydom提供了一系列的NewXXX方法用于创建各种不同类型的节点:
     doc.InsertEndChild(tinydom.NewProcInst(doc, "xml", `version="1.0" encoding="UTF-8"`))
 ```
 
-我们可以使用XMLDocument.Accept方法来将这个XML文档输出：
+我们可以使用`XMLDocument`的`Accept`方法来将这个XML文档输出：
 ```go
     doc.Accept(tinydom.NewSimplePrinter(os.Stdout, tinydom.PrettyPrint))
 ```
@@ -198,7 +198,7 @@ type PrintOptions struct {
 - `PrettyPrint` 优美打印: 节点输出自动折行,并按4个空格缩进
 - `StreamPrint` 流式打印: 节点输出不带换行,除非Text部分有换行
 
-对于自定义XML文档输出模式而言,处理XML字符转义是个麻烦,因为你必须处理一些细节.但tinydom也可在这方面帮助你,tinydom提供了
+对于自定义XML文档输出模式而言,处理XML字符转义是个麻烦,因为你必须处理一些细节.但tinydom也可在这方面帮助你.tinydom提供了
 `tinydom.EscapeAttribute`和`tinydom.EscapeText`来方便处理属性和`XMLText`中的转义字符.您也可以使用golang自带
 的`xml.EscapeText`,只是这个函数做了更多的转义,会导致文档更难阅读和编辑.
 
