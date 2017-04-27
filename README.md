@@ -88,7 +88,7 @@ FirstChildElement、LastChildElement、PreviousSiblingElement、NextSiblingEleme
 
 - 获取节点属性
 
-`XMLElement`接口提供了多个属性的函数:
+`XMLElement`接口提供了多个获取属性的函数:
 
 查找: `FindAttribute(name string) XMLAttribute`
 
@@ -97,13 +97,6 @@ FirstChildElement、LastChildElement、PreviousSiblingElement、NextSiblingEleme
 属性个数统计: `AttributeCount() int`
 
 直接获取属性字符串: `Attribute(name string, def string) string`
-
-新增属性或者修改属性值: `SetAttribute(name string, value string) XMLAttribute`
-
-删除属性: `DeleteAttribute(name string) XMLAttribute`
-
-删除所有属性: `ClearAttributes()`
-
 
 
 ##  文档的遍历
@@ -153,8 +146,13 @@ tinydom提供了一系列的NewXXX方法用于创建各种不同类型的节点:
 
 - 删除本节点的node子节点:`tinydom.DeleteChild(node XMLNode)``
 
+我们也可以对节点的属性进行操作:
 
+- 新增属性或者修改属性值: `SetAttribute(name string, value string) XMLAttribute`
 
+- 删除属性: `DeleteAttribute(name string) XMLAttribute`
+
+- 删除所有属性: `ClearAttributes()`
 
 下面的代码创建了一个XML文档：
 ```go
