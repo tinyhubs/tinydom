@@ -7,6 +7,7 @@ import (
     "testing"
     //    "bytes"
     "bytes"
+    "io/ioutil"
 )
 
 func expect(t *testing.T, message string, result bool) {
@@ -616,4 +617,18 @@ func Test_Print(t *testing.T) {
     doc.Accept(NewSimplePrinter(os.Stdout, opt))
     //doc.Accept(NewSimplePrinter(os.Stdout, StreamPrint))
     fmt.Println("\n=========================================================\n")
+}
+
+func Test_Version(t *testing.T) {
+    datas, err := ioutil.ReadFile("version")
+    if nil != err {
+        t.Fail()
+        return
+    }
+    
+    ver := strings.TrimSpace(string(datas))
+    if ver != Version() {
+        t.Fail()
+        return
+    }
 }

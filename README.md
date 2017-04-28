@@ -28,25 +28,27 @@ tinydom借鉴了[tinyxml2](http://www.grinninglizard.com/tinyxml2/index.html)的
 
 ##  加载文档
 `tinydom.LoadDocument`用于从一个文件流或者字符流读取XML数据，并构建出`tinydom.XMLDocument`对象，一般用于读取XML文件的场景。
+
 ```go
-  import "tinydom"
-  doc, err := tinydom.LoadDocument(strings.NewReader(s))
+import "tinydom"
+doc, err := tinydom.LoadDocument(strings.NewReader(s))
 ```
 
 `FirstChildElement`、`LastChildElement`、`PreviousSiblingElement`、`NextSiblingElement`这几个函数，主要是为了方便查找`XMLElement`元素，
 大部分情况下我们建立XML文档的DOM模型就是为了对XMLElement进行访问。
+
 ```go
-    xmlstr := `
-    <books>
-        <book><name>The Moon</name><author>Tom</author></book>
-        <book><name>Go west</name><author>Suny</author></book>
-    <books>
-    `
-    doc, _ := tinydom.LoadDocument(strings.NewReader(xmlstr))
-    elem1 := doc.FirstChildElement("books").FirstChildElement("book").FirstChildElement("name")
-    fmt.Println(elem1.Text()) //	The Moon
-    elem2 := doc.FirstChildElement("books").FirstChildElement("book").LastChildElement("author")
-    fmt.Println(elem2.Text()) //	Suny
+xmlstr := `
+<books>
+    <book><name>The Moon</name><author>Tom</author></book>
+    <book><name>Go west</name><author>Suny</author></book>
+<books>
+`
+doc, _ := tinydom.LoadDocument(strings.NewReader(xmlstr))
+elem1 := doc.FirstChildElement("books").FirstChildElement("book").FirstChildElement("name")
+fmt.Println(elem1.Text()) //	The Moon
+elem2 := doc.FirstChildElement("books").FirstChildElement("book").LastChildElement("author")
+fmt.Println(elem2.Text()) //	Suny
 ```
 
 
@@ -102,22 +104,25 @@ tinydom借鉴了[tinyxml2](http://www.grinninglizard.com/tinyxml2/index.html)的
 ##  文档的遍历
 `Parent`、`FirstChild`、`LastChild`、`PreviousSibling`、`NextSibling`用于使我们可以方便地在XML的DOM树中游走。
 下面这个函数可以用于对一个doc进行遍历：
+
 ```go
-    func walk(m int , rootNode tinydom.XMLNode) {
-        if nil == rootNode {
-            return
-        }
-        for child := rootNode.FirstChild(); nil != child; child = child.NextSibling() {
-            fmt.Println(strings.Repeat(" ", m), child.Value())
-            walk(m + 1, child)
-        }
+func walk(m int , rootNode tinydom.XMLNode) {
+    if nil == rootNode {
+        return
     }
+    for child := rootNode.FirstChild(); nil != child; child = child.NextSibling() {
+        fmt.Println(strings.Repeat(" ", m), child.Value())
+        walk(m + 1, child)
+    }
+}
 ```
 
 您可以这样调用：
+
 ```go
-walk(doc)。
+walk(0, doc)
 ```
+
 还有一个更好的替代方式是使用`tinydom.XMLVisitor`接口对文档中的元素进行遍历，可参见代码中`tinydom.XMLVisitor`的接口定义。
 
 ##  新建文档
@@ -156,18 +161,20 @@ tinydom提供了一系列的NewXXX方法用于创建各种不同类型的节点:
 - 删除所有属性: `ClearAttributes()`
 
 下面的代码创建了一个XML文档：
+
 ```go
-    doc := tinydom.NewDocument()
-    books := doc.InsertEndChild(tinydom.NewElement(doc, "books"))
-    book := books.InsertEndChild(tinydom.NewElement(doc, "book"))
-    name := book.InsertEndChild(tinydom.NewElement(doc, "name"))
-    name.InsertEndChild(tinydom.NewText(doc, "The Moon"))
-    doc.InsertEndChild(tinydom.NewProcInst(doc, "xml", `version="1.0" encoding="UTF-8"`))
+doc := tinydom.NewDocument()
+books := doc.InsertEndChild(tinydom.NewElement(doc, "books"))
+book := books.InsertEndChild(tinydom.NewElement(doc, "book"))
+name := book.InsertEndChild(tinydom.NewElement(doc, "name"))
+name.InsertEndChild(tinydom.NewText(doc, "The Moon"))
+doc.InsertEndChild(tinydom.NewProcInst(doc, "xml", `version="1.0" encoding="UTF-8"`))
 ```
 
 我们可以使用`tinydom.XMLDocument`的`Accept`方法来将这个XML文档输出：
+
 ```go
-    doc.Accept(tinydom.NewSimplePrinter(os.Stdout, tinydom.PrettyPrint))
+doc.Accept(tinydom.NewSimplePrinter(os.Stdout, tinydom.PrettyPrint))
 ```
 
 ##  输出
@@ -182,6 +189,7 @@ doc.Accept(tinydom.NewSimplePrinter(os.Stdout, tinydom.PrettyPrint))
 ```
 
 `tinydom.NewSimplePrinter`的接口如下:
+
 ```go
 func NewSimplePrinter(writer io.Writer, options PrintOptions) XMLVisitor
 ```
@@ -207,33 +215,35 @@ type PrintOptions struct {
 
 ##  XML字符转义
 受益于go的xml库，tinydom也支持XML字符转义，使用tinydom在读写xml的数据的时候不需要关注XML转义字符，tinydom自动会处理好，可参考下面的例子：
+
 ```go
-    xmlstr :=
-        `<talks>
-            <talk from="bill" to="tom">[&amp;&apos;&quot;&gt;&lt;] are the xml escape chars? </talk>
-            <talk from="tom" to="bill">yes， that is right</talk>
-         </talks>
-        `
-    doc, _ := tinydom.LoadDocument(strings.NewReader(xmlstr))
-    talk := doc.FirstChildElement("talks").FirstChildElement("talk").Text()
-    fmt.Print(talk) //  [&'"><] are the xml escape chars?
+xmlstr :=
+    `<talks>
+        <talk from="bill" to="tom">[&amp;&apos;&quot;&gt;&lt;] are the xml escape chars? </talk>
+        <talk from="tom" to="bill">yes， that is right</talk>
+     </talks>
+    `
+doc, _ := tinydom.LoadDocument(strings.NewReader(xmlstr))
+talk := doc.FirstChildElement("talks").FirstChildElement("talk").Text()
+fmt.Print(talk) //  [&'"><] are the xml escape chars?
 ```
 
 xml文档输出时,可使用`tinydom.EscapeAttribute`和`tinydom.EscapeText`来对字符进行转义.
 
 ##  CDATA
 只有XMLText对象才涉及到CDATA，可以通过XMLText获取到CDATA对象的数据，tinydom能够自动识别CDATA，但是将DOM对象序列化成字符串时，除非节点指定了CDATA属性，否则会直接转义。
+
 ```go
-	xmlstr := `<content><![CDATA[<example>This is ok in cdata text</example>]]></content>`
-	doc, _ := tinydom.LoadDocument(strings.NewReader(xmlstr))
-    content := doc.FirstChildElement("content")
-	fmt.Println("\nRead CDATA:", content.Text())
-	fmt.Println("\nNormal Print:")
-	doc.Accept(tinydom.NewSimplePrinter(os.Stdout))
-	text := content.FirstChild().ToText()
-	text.SetCDATA(true)
-	fmt.Println("\nSpecial as CDATA:")
-	doc.Accept(tinydom.NewSimplePrinter(os.Stdout))
+xmlstr := `<content><![CDATA[<example>This is ok in cdata text</example>]]></content>`
+doc, _ := tinydom.LoadDocument(strings.NewReader(xmlstr))
+content := doc.FirstChildElement("content")
+fmt.Println("\nRead CDATA:", content.Text())
+fmt.Println("\nNormal Print:")
+doc.Accept(tinydom.NewSimplePrinter(os.Stdout))
+text := content.FirstChild().ToText()
+text.SetCDATA(true)
+fmt.Println("\nSpecial as CDATA:")
+doc.Accept(tinydom.NewSimplePrinter(os.Stdout))
 ```
 
 ##  名字空间
@@ -244,3 +254,15 @@ xml文档输出时,可使用`tinydom.EscapeAttribute`和`tinydom.EscapeText`来�
 ##  BOM
 golang的xml解析器自身还不支持BOM，所以本解析器还无法解析带BOM头的xml文件。
 
+## Changelog
+
+#### 1.0.0 初始版本
+
+#### 1.1.0 小版本改进,能力增强,bug解决
+
+- 文档输出增加打印选项控制,支持"优美打印" <font color="red">`接口变更`</font> `NewSimplePrinter`
+- 优化字符转义切新增转义处理的接口 `tinydom.ExcapeText` `tinydom.ExcapeAttribute`
+- 解决用例稳定性问题
+- 完善文档
+- github仓库增加了构建服务和文档服务
+- 增加版本识别函数

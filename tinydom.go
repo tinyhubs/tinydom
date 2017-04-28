@@ -1177,3 +1177,8 @@ func EscapeText(w io.Writer, s []byte) error {
     }
     return nil
 }
+
+func Version() string {
+    return "1.1.0"
+}
+
