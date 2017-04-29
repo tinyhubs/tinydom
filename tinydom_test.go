@@ -656,13 +656,13 @@ func Test_EscapeAttribute(t *testing.T) {
         }
     }
     
-    tester(`&`, `&amp;`)
-    tester(`"`, `&quot;`)
-    tester(`<`, `&lt;`)
-    tester("\n", `&#xA;`)
-    tester("\r", `&#xD;`)
-    tester(`'`, `'`)
-    tester(`>`, `>`)
+    tester(`libbylg@126.com&libbylg@126.com`, `libbylg@126.com&amp;libbylg@126.com`)
+    tester(`"libbylg@126.com`, `&quot;libbylg@126.com`)
+    tester(`libbylg@126.com<`, `libbylg@126.com&lt;`)
+    tester("aaa\n", `aaa&#xA;`)
+    tester("\raaa", `&#xD;aaa`)
+    tester(`aaa'`, `aaa'`)
+    tester(`aaa>aaa`, `aaa>aaa`)
 }
 
 
@@ -689,11 +689,11 @@ func Test_EscapeText(t *testing.T) {
         }
     }
     
-    tester(`&`, `&amp;`)
-    tester(`<`, `&lt;`)
-    tester(`"`, `"`)
-    tester("\n", "\n")
-    tester("\r", "\r")
-    tester(`'`, `'`)
-    tester(`>`, `>`)
+    tester(`libbylg@126.com&libbylg@126.com`, `libbylg@126.com&amp;libbylg@126.com`)
+    tester(`libbylg@126.com<`, `libbylg@126.com&lt;`)
+    tester(`"libbylg@126.com`, `"libbylg@126.com`)
+    tester("aaa\naaa", "aaa\naaa")
+    tester("\raaa", "\raaa")
+    tester(`aaa'`, `aaa'`)
+    tester(`aaa>aaa`, `aaa>aaa`)
 }
