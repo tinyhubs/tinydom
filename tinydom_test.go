@@ -632,3 +632,68 @@ func Test_Version(t *testing.T) {
         return
     }
 }
+
+func Test_EscapeAttribute(t *testing.T) {
+    
+    tester := func(str string, esc string) {
+        doc := NewDocument()
+        if nil == doc {
+            t.Fail()
+            return
+        }
+        
+        elem := NewElement(doc, "elem")
+        elem.SetAttribute("attr", str)
+        doc.InsertEndChild(elem)
+        
+        buf := bytes.NewBufferString("")
+        doc.Accept(NewSimplePrinter(buf, StreamPrint))
+        
+        compare := fmt.Sprintf(`<elem attr="%s"/>`, esc)
+        if compare != buf.String() {
+            t.Fail()
+            return
+        }
+    }
+    
+    tester(`&`, `&amp;`)
+    tester(`"`, `&quot;`)
+    tester(`<`, `&lt;`)
+    tester("\n", `&#xA;`)
+    tester("\r", `&#xD;`)
+    tester(`'`, `'`)
+    tester(`>`, `>`)
+}
+
+
+func Test_EscapeText(t *testing.T) {
+    
+    tester := func(str string, esc string) {
+        doc := NewDocument()
+        if nil == doc {
+            t.Fail()
+            return
+        }
+        
+        elem := NewElement(doc, "elem")
+        doc.InsertEndChild(elem)
+        elem.SetText(str)
+        
+        buf := bytes.NewBufferString("")
+        doc.Accept(NewSimplePrinter(buf, StreamPrint))
+        
+        compare := fmt.Sprintf(`<elem>%s</elem>`, esc)
+        if compare != buf.String() {
+            t.Fail()
+            return
+        }
+    }
+    
+    tester(`&`, `&amp;`)
+    tester(`<`, `&lt;`)
+    tester(`"`, `"`)
+    tester("\n", "\n")
+    tester("\r", "\r")
+    tester(`'`, `'`)
+    tester(`>`, `>`)
+}
