@@ -266,6 +266,7 @@ golang的xml解析器自身还不支持BOM，所以本解析器还无法解析�
 - 文档输出增加打印选项控制,支持"优美打印" <font color="red">`接口变更`</font> `NewSimplePrinter`
 - 优化字符转义切新增转义处理的接口 `tinydom.ExcapeText` `tinydom.ExcapeAttribute`
 - 解决用例稳定性问题
+- 取消支持go 1.4.x版本 `因为该版本无法没有覆盖率统计工具`
 - 完善文档
 - github仓库增加了构建服务和文档服务
 - 增加版本识别函数
