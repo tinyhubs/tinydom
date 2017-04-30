@@ -1162,12 +1162,12 @@ func isInCharacterRange(r rune) (inrange bool) {
 //  '       yes    yes    &apos;
 //  >       yes    yes    &gt;
 var (
-    esc_amp  = []byte("&amp;")
-    esc_lt   = []byte("&lt;")
-    esc_quot = []byte("&quot;")
-    esc_nl   = []byte("&#xA;")
-    esc_cr   = []byte("&#xD;")
-    esc_fffd = []byte("\uFFFD") // Unicode replacement character
+    escAmps = []byte("&amp;")
+    escLt   = []byte("&lt;")
+    escQuot = []byte("&quot;")
+    escNl   = []byte("&#xA;")
+    escCr   = []byte("&#xD;")
+    escFFFD = []byte("\uFFFD") // Unicode replacement character
 )
 
 func EscapeAttribute(w io.Writer, s []byte) error {
@@ -1178,18 +1178,18 @@ func EscapeAttribute(w io.Writer, s []byte) error {
         i += width
         switch r {
         case '&':
-            esc = esc_amp
+            esc = escAmps
         case '<':
-            esc = esc_lt
+            esc = escLt
         case '"':
-            esc = esc_quot
+            esc = escQuot
         case '\n':
-            esc = esc_nl
+            esc = escNl
         case '\r':
-            esc = esc_cr
+            esc = escCr
         default:
             if !isInCharacterRange(r) || (r == 0xFFFD && width == 1) {
-                esc = esc_fffd
+                esc = escFFFD
                 break
             }
             continue
@@ -1216,12 +1216,12 @@ func EscapeText(w io.Writer, s []byte) error {
         i += width
         switch r {
         case '&':
-            esc = esc_amp
+            esc = escAmps
         case '<':
-            esc = esc_lt
+            esc = escLt
         default:
             if !isInCharacterRange(r) || (r == 0xFFFD && width == 1) {
-                esc = esc_fffd
+                esc = escFFFD
                 break
             }
             continue
