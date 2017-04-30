@@ -61,15 +61,13 @@ fmt.Println(elem2.Text()) //	Suny
 
 `FirstChild`、`LastChild`这两个函数用于获取某个节点的子节点,不管节点是什么类型都可以用这两个函数获取到.
 
-`FirstChildElement`、`LastChildElement`这两个函数专用于查找指定的Element节点,如果指定了name参数,
-那么只查找指定名字的子Element节点.
+`FirstChildElement`、`LastChildElement`这两个函数专用于查找指定的Element节点,如果指定了name参数,那么只查找指定名字的子Element节点.
 
 - 获取相邻节点
 
 `Prev`、`Next`这两个函数用于查找当前节点的前一个或者后一个兄弟节点.
 
-`PrevElement`、`NextElement`这两个函数用于查找当前节点的上一个或者下一个Element节点.
-我们同样可以通过指定这两个函数的name参数来查找执行名字的Element节点.
+`PrevElement`、`NextElement`这两个函数用于查找当前节点的上一个或者下一个Element节点.我们同样可以通过指定这两个函数的name参数来查找执行名字的Element节点.
 
 - 获取父节点
 
@@ -145,15 +143,17 @@ tinydom提供了一系列的NewXXX方法用于创建各种不同类型的节点:
 
 而下面这些函数用于将任意类型的节点加入当前节点,或者对节点进行删除操作:
 
-- 将node添加为本节点的最后一个子节点(最常用):`tinydom.InsertEndChild(node XMLNode) XMLNode`
+- 将node添加为本节点的最后一个子节点(最常用):`InsertEndChild(node XMLNode) XMLNode`
 
-- 将node添加为本节点的第一个子节点:`tinydom.InsertFirstChild(node XMLNode) XMLNode`
+- 将node添加为本节点的第一个子节点:`InsertFirstChild(node XMLNode) XMLNode`
 
-//- 将addThis添加到本节点的子节点afterThis的前面:`tinydom.InsertAfterChild(afterThis XMLNode, addThis XMLNode) XMLNode`
+//- 将addThis添加到当前节点的前面:`InsertBack(addThis XMLNode) XMLNode`
 
-- 删除所有的子节点:`tinydom.DeleteChildren()`
+- 删除本节点所有的子节点:`DeleteChildren()`
 
-- 删除本节点的node子节点:`tinydom.DeleteChild(node XMLNode)`
+- 删除本节点的指定的子节点:`DeleteChild(node XMLNode)`
+
+- 将本节点从其所属的document中拆除:`Split()`
 
 我们也可以对节点的属性进行操作:
 
@@ -266,10 +266,13 @@ golang的xml解析器自身还不支持BOM，所以本解析器还无法解析�
 - 文档输出增加打印选项控制,支持"优美打印" <font color="red">`接口变更`</font> `NewSimplePrinter`
 - 优化字符转义切新增转义处理的接口 `tinydom.ExcapeText` `tinydom.ExcapeAttribute`
 - 简化接口 `Previous` 缩写为 `Prev`,`Sibling`单词从所有接口中删除
-- 删除接口 `InsertAfterChild` 建议使用 `InsertNext` 或者 `InsertElementNext` 代替
-- 增加接口 ``
+- 删除接口 `InsertAfterChild` 建议使用 `InsertBack` 或者 `InsertElementBack` 代替
+- 增加接口 `Split`,`InsertFront`,`InsertBack`
+- 增加版本识别函数 `tinydom.Version`
 - 解决用例稳定性问题
 - 取消支持go-1.4.x版本 `因为该版本没有覆盖率统计工具`
 - 完善文档
-- github仓库增加了构建服务和文档服务
-- 增加版本识别函数
+- github仓库增加了构建服务,文档服务
+- 补充用例,增加代码覆盖率到90%以上
+
+
