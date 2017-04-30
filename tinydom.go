@@ -30,30 +30,44 @@ type XMLNode interface {
     Value() string
     SetValue(newValue string)
     
-    GetDocument() XMLDocument
+    Document() XMLDocument
     
     NoChildren() bool
     Parent() XMLNode
     FirstChild() XMLNode
     LastChild() XMLNode
-    PreviousSibling() XMLNode
-    NextSibling() XMLNode
+    Prev() XMLNode
+    Next() XMLNode
     FirstChildElement(name string) XMLElement
     LastChildElement(name string) XMLElement
-    PreviousSiblingElement(name string) XMLElement
-    NextSiblingElement(name string) XMLElement
+    PrevElement(name string) XMLElement
+    NextElement(name string) XMLElement
     
+    InsertBack(node XMLNode) XMLNode
+    InsertFront(node XMLNode) XMLNode
     InsertEndChild(node XMLNode) XMLNode
     InsertFirstChild(node XMLNode) XMLNode
-    InsertAfterChild(afterThis XMLNode, addThis XMLNode) XMLNode
+    
+    InsertElementBack(name string) XMLElement
+    InsertElementFront(name string) XMLElement
+    InsertElementEndChild(name string) XMLElement
+    InsertElementFirstChild(name string) XMLElement
+    
     DeleteChildren()
     DeleteChild(node XMLNode)
+    
+    Split() XMLNode
+    
     Accept(visitor XMLVisitor) bool
     
     //  被迫入侵的接口
+    insertBeforeChild(beforeThis XMLNode, addThis XMLNode) XMLNode
+    insertAfterChild(afterThis XMLNode, addThis XMLNode) XMLNode
     setParent(node XMLNode)
     setPrev(node XMLNode)
     setNext(node XMLNode)
+    setDocument(doc XMLDocument)
+    impl() XMLNode
     
     unlink(child XMLNode)
 }
@@ -127,17 +141,15 @@ type XMLVisitor interface {
 }
 
 type XMLHandle interface {
-    //Root() XMLCursor
-    //
     Parent() XMLHandle
     FirstChild() XMLHandle
     LastChild() XMLHandle
-    PreviousSibling() XMLHandle
-    NextSibling() XMLHandle
+    Prev() XMLHandle
+    Next() XMLHandle
     FirstChildElement(name string) XMLHandle
     LastChildElement(name string) XMLHandle
-    PreviousSiblingElement(name string) XMLHandle
-    NextSiblingElement(name string) XMLHandle
+    PrevElement(name string) XMLHandle
+    NextElement(name string) XMLHandle
     
     ToNode() XMLNode
     ToElement() XMLElement
@@ -170,7 +182,7 @@ func (this *xmlAttributeImpl) SetValue(newValue string) {
 //==================================================================
 
 type xmlNodeImpl struct {
-    impl XMLNode
+    impl_ XMLNode
     
     document XMLDocument
     parent   XMLNode
@@ -183,10 +195,6 @@ type xmlNodeImpl struct {
     next XMLNode
 }
 
-func (this *xmlNodeImpl) getDocument() XMLDocument {
-    return this.document
-}
-
 func (this *xmlNodeImpl) setParent(node XMLNode) {
     this.parent = node
 }
@@ -197,6 +205,14 @@ func (this *xmlNodeImpl) setPrev(node XMLNode) {
 
 func (this *xmlNodeImpl) setNext(node XMLNode) {
     this.next = node
+}
+
+func (this *xmlNodeImpl) setDocument(doc XMLDocument) {
+    this.document = doc
+}
+
+func (this *xmlNodeImpl) impl() XMLNode {
+    return this.impl_
 }
 
 func (this *xmlNodeImpl) ToElement() XMLElement {
@@ -231,7 +247,7 @@ func (this *xmlNodeImpl) SetValue(newValue string) {
     this.value = newValue
 }
 
-func (this *xmlNodeImpl) GetDocument() XMLDocument {
+func (this *xmlNodeImpl) Document() XMLDocument {
     return this.document
 }
 
@@ -251,16 +267,16 @@ func (this *xmlNodeImpl) LastChild() XMLNode {
     return this.lastChild
 }
 
-func (this *xmlNodeImpl) PreviousSibling() XMLNode {
+func (this *xmlNodeImpl) Prev() XMLNode {
     return this.prev
 }
 
-func (this *xmlNodeImpl) NextSibling() XMLNode {
+func (this *xmlNodeImpl) Next() XMLNode {
     return this.next
 }
 
 func (this *xmlNodeImpl) FirstChildElement(name string) XMLElement {
-    for item := this.firstChild; nil != item; item = item.NextSibling() {
+    for item := this.firstChild; nil != item; item = item.Next() {
         elem := item.ToElement()
         if nil == elem {
             continue
@@ -276,7 +292,7 @@ func (this *xmlNodeImpl) FirstChildElement(name string) XMLElement {
 
 func (this *xmlNodeImpl) LastChildElement(name string) XMLElement {
     
-    for item := this.lastChild; nil != item; item = item.PreviousSibling() {
+    for item := this.lastChild; nil != item; item = item.Prev() {
         elem := item.ToElement()
         if nil == elem {
             continue
@@ -290,8 +306,8 @@ func (this *xmlNodeImpl) LastChildElement(name string) XMLElement {
     return nil
 }
 
-func (this *xmlNodeImpl) PreviousSiblingElement(name string) XMLElement {
-    for item := this.prev; nil != item; item = item.PreviousSibling() {
+func (this *xmlNodeImpl) PrevElement(name string) XMLElement {
+    for item := this.prev; nil != item; item = item.Prev() {
         elem := item.ToElement()
         if nil == elem {
             continue
@@ -305,9 +321,9 @@ func (this *xmlNodeImpl) PreviousSiblingElement(name string) XMLElement {
     return nil
 }
 
-func (this *xmlNodeImpl) NextSiblingElement(name string) XMLElement {
+func (this *xmlNodeImpl) NextElement(name string) XMLElement {
     
-    for item := this.next; nil != item; item = item.NextSibling() {
+    for item := this.next; nil != item; item = item.Next() {
         elem := item.ToElement()
         if nil == elem {
             continue
@@ -319,36 +335,41 @@ func (this *xmlNodeImpl) NextSiblingElement(name string) XMLElement {
     }
     
     return nil
+}
+
+func (this *xmlNodeImpl) Split() XMLNode {
+    
+    if nil != this.parent {
+        this.parent.unlink(this)
+    }
+    
+    return this
 }
 
 func (this *xmlNodeImpl) unlink(child XMLNode) {
     if child == this.firstChild {
-        this.firstChild = this.firstChild.NextSibling()
+        this.firstChild = this.firstChild.Next()
     }
     
     if child == this.lastChild {
-        this.lastChild = this.lastChild.PreviousSibling()
+        this.lastChild = this.lastChild.Prev()
     }
     
-    if nil != child.PreviousSibling() {
-        child.PreviousSibling().setNext(child.NextSibling())
+    if nil != child.Prev() {
+        child.Prev().setNext(child.Next())
     }
     
-    if nil != child.NextSibling() {
-        child.NextSibling().setPrev(child.PreviousSibling())
+    if nil != child.Next() {
+        child.Next().setPrev(child.Prev())
     }
     
     child.setParent(nil)
+    
+    child.setDocument(nil)
 }
 
 func (this *xmlNodeImpl) InsertEndChild(addThis XMLNode) XMLNode {
-    if addThis.GetDocument() != this.document {
-        return nil
-    }
-    
-    if nil != addThis.Parent() {
-        addThis.Parent().unlink(addThis)
-    }
+    addThis.Split()
     
     if nil != this.lastChild {
         this.lastChild.setNext(addThis)
@@ -363,18 +384,13 @@ func (this *xmlNodeImpl) InsertEndChild(addThis XMLNode) XMLNode {
         addThis.setNext(nil)
     }
     
-    addThis.setParent(this.impl)
+    addThis.setParent(this.impl_)
+    addThis.setDocument(this.document)
     return addThis
 }
 
 func (this *xmlNodeImpl) InsertFirstChild(addThis XMLNode) XMLNode {
-    if addThis.GetDocument() != this.document {
-        return nil
-    }
-    
-    if nil != addThis.Parent() {
-        addThis.Parent().unlink(addThis)
-    }
+    addThis.Split()
     
     if nil != this.firstChild {
         this.firstChild.setPrev(addThis)
@@ -389,34 +405,86 @@ func (this *xmlNodeImpl) InsertFirstChild(addThis XMLNode) XMLNode {
         addThis.setNext(nil)
     }
     
-    addThis.setParent(this.impl)
+    addThis.setParent(this.impl_)
+    addThis.setDocument(this.document)
     return addThis
 }
 
-func (this *xmlNodeImpl) InsertAfterChild(afterThis XMLNode, addThis XMLNode) XMLNode {
-    if addThis.GetDocument() != this.document {
-        return nil
-    }
+
+func (this *xmlNodeImpl) insertAfterChild(afterThis XMLNode, addThis XMLNode) XMLNode {
     
-    if afterThis.Parent() != this.impl {
-        return nil
-    }
+    //if afterThis.Parent() != this.impl_ {
+    //    return nil
+    //}
     
-    if afterThis.NextSibling() == nil {
+    if afterThis.Next() == nil {
         return this.InsertEndChild(addThis)
     }
     
-    if nil != addThis.Parent() {
-        addThis.Parent().unlink(addThis)
-    }
+    addThis.Split()
     
     addThis.setPrev(afterThis)
-    addThis.setNext(afterThis.NextSibling())
-    afterThis.NextSibling().setPrev(addThis)
+    addThis.setNext(afterThis.Next())
+    afterThis.Next().setPrev(addThis)
     afterThis.setNext(addThis)
-    addThis.setParent(this.impl)
+    addThis.setParent(this.impl_)
+    addThis.setDocument(this.document)
     
     return addThis
+}
+
+func (this *xmlNodeImpl) insertBeforeChild(beforeThis XMLNode, addThis XMLNode) XMLNode {
+    
+    //if beforeThis.Parent() != this.impl_ {
+    //    return nil
+    //}
+    
+    if beforeThis.Prev() == nil {
+        return this.InsertFirstChild(addThis)
+    }
+    
+    addThis.Split()
+    
+    addThis.setPrev(beforeThis.Prev())
+    addThis.setNext(beforeThis)
+    beforeThis.Prev().setNext(addThis)
+    beforeThis.setPrev(addThis)
+    addThis.setParent(this.impl_)
+    addThis.setDocument(this.document)
+    
+    return addThis
+}
+
+func (this *xmlNodeImpl) InsertBack(addThis XMLNode) XMLNode {
+    if nil == this.parent {
+        return nil
+    }
+    
+    return this.parent.insertAfterChild(this, addThis)
+}
+
+func (this *xmlNodeImpl) InsertFront(addThis XMLNode) XMLNode {
+    if nil == this.parent {
+        return nil
+    }
+    
+    return this.parent.insertBeforeChild(this, addThis)
+}
+
+func (this *xmlNodeImpl) InsertElementFront(name string) XMLElement {
+    return this.InsertFront(NewElement(name)).ToElement()
+}
+
+func (this *xmlNodeImpl) InsertElementBack(name string) XMLElement {
+    return this.InsertBack(NewElement(name)).ToElement()
+}
+
+func (this *xmlNodeImpl) InsertElementEndChild(name string) XMLElement {
+    return this.InsertEndChild(NewElement(name)).ToElement()
+}
+
+func (this *xmlNodeImpl) InsertElementFirstChild(name string) XMLElement {
+    return this.InsertFirstChild(NewElement(name)).ToElement()
 }
 
 func (this *xmlNodeImpl) DeleteChildren() {
@@ -433,7 +501,7 @@ func (this *xmlNodeImpl) DeleteChild(node XMLNode) {
 }
 
 func (this *xmlNodeImpl) Accept(visitor XMLVisitor) bool {
-    return false
+    return this.impl().Accept(visitor)
 }
 
 //------------------------------------------------------------------
@@ -452,7 +520,7 @@ func (this *xmlElementImpl) ToElement() XMLElement {
 func (this *xmlElementImpl) Accept(visitor XMLVisitor) bool {
     
     if visitor.VisitEnterElement(this) {
-        for node := this.FirstChild(); nil != node; node = node.NextSibling() {
+        for node := this.FirstChild(); nil != node; node = node.Next() {
             if !node.Accept(visitor) {
                 break
             }
@@ -543,7 +611,7 @@ func (this *xmlElementImpl) SetText(inText string) {
     if node := this.FirstChild(); (nil != node) && (nil != node.ToText()) {
         node.SetValue(inText)
     } else {
-        theText := NewText(this.getDocument(), inText)
+        theText := NewText(inText)
         this.InsertFirstChild(theText)
     }
 }
@@ -624,7 +692,7 @@ func (this *xmlDocumentImpl) ToDocument() XMLDocument {
 func (this *xmlDocumentImpl) Accept(visitor XMLVisitor) bool {
     
     if visitor.VisitEnterDocument(this) {
-        for node := this.FirstChild(); nil != node; node = node.NextSibling() {
+        for node := this.FirstChild(); nil != node; node = node.Next() {
             if !node.Accept(visitor) {
                 break
             }
@@ -671,48 +739,43 @@ func (this *xmlDirectiveImpl) Accept(visitor XMLVisitor) bool {
 //------------------------------------------------------------------
 
 //	NewText	创建一个新的XMLText对象
-func NewText(document XMLDocument, text string) XMLText {
+func NewText(text string) XMLText {
     node := new(xmlTextImpl)
-    node.impl = node
-    node.document = document
+    node.impl_ = node
     node.value = text
     return node
 }
 
 //	XMLComment	创建一个新的XMLComment对象
-func NewComment(document XMLDocument, comment string) XMLComment {
+func NewComment(comment string) XMLComment {
     node := new(xmlCommentImpl)
-    node.impl = node
-    node.document = document
+    node.impl_ = node
     node.value = comment
     return node
 }
 
 //	NewElement	创建一个新的XMLElement对象
-func NewElement(document XMLDocument, name string) XMLElement {
+func NewElement(name string) XMLElement {
     node := new(xmlElementImpl)
-    node.impl = node
-    node.document = document
+    node.impl_ = node
     node.value = name
     node.attributes = make(map[string]XMLAttribute)
     return node
 }
 
 //	NewProcInst	创建一个新的XMLProcInst对象
-func NewProcInst(document XMLDocument, target string, inst string) XMLProcInst {
+func NewProcInst(target string, inst string) XMLProcInst {
     node := new(xmlProcInstImpl)
-    node.impl = node
-    node.document = document
+    node.impl_ = node
     node.value = target
     node.instruction = inst
     return node
 }
 
 //	NewDirective	创建一个新的XMLDirective对象
-func NewDirective(document XMLDocument, directive string) XMLDirective {
+func NewDirective(directive string) XMLDirective {
     node := new(xmlDirectiveImpl)
-    node.impl = node
-    node.document = document
+    node.impl_ = node
     node.value = directive
     return node
 }
@@ -728,10 +791,10 @@ func newAttribute(name string, value string) XMLAttribute {
 
 //	NewDocument	创建一个全新的XMLDocument对象
 func NewDocument() XMLDocument {
-    node := new(xmlDocumentImpl)
-    node.impl = node
-    node.document = node
-    return node
+    doc := new(xmlDocumentImpl)
+    doc.impl_ = doc
+    doc.document = doc
+    return doc
 }
 
 //	LoadDocument	从rd流中读取XML码流并构建成XMLDocument对象
@@ -757,7 +820,7 @@ func LoadDocument(rd io.Reader) (XMLDocument, error) {
                 rootElemExist = true
             }
             
-            node := NewElement(doc, startElement.Name.Local)
+            node := NewElement(startElement.Name.Local)
             for _, item := range startElement.Attr {
                 if nil != node.FindAttribute(item.Name.Local) {
                     return nil, errors.New("Attributes have the same name:" + item.Name.Local)
@@ -772,15 +835,15 @@ func LoadDocument(rd io.Reader) (XMLDocument, error) {
             parent = parent.Parent()
         case xml.Comment:
             comment := token.(xml.Comment)
-            node := NewComment(doc, string(comment))
+            node := NewComment(string(comment))
             parent.InsertEndChild(node)
         case xml.Directive:
             directive := token.(xml.Directive)
-            node := NewDirective(doc, string(directive))
+            node := NewDirective(string(directive))
             parent.InsertEndChild(node)
         case xml.ProcInst:
             procInst := token.(xml.ProcInst)
-            node := NewProcInst(doc, procInst.Target, string(procInst.Inst))
+            node := NewProcInst(procInst.Target, string(procInst.Inst))
             parent.InsertEndChild(node)
         case xml.CharData:
             charData := token.(xml.CharData)
@@ -790,7 +853,7 @@ func LoadDocument(rd io.Reader) (XMLDocument, error) {
                     return nil, errors.New("Text should be in the element")
                 }
                 
-                node := NewText(doc, string(charData))
+                node := NewText(string(charData))
                 parent.InsertEndChild(node)
             }
         default:
@@ -977,20 +1040,20 @@ func (this *xmlHandleImpl) LastChild() XMLHandle {
     return NewHandle(this.node.LastChild())
 }
 
-func (this *xmlHandleImpl) PreviousSibling() XMLHandle {
+func (this *xmlHandleImpl) Prev() XMLHandle {
     if nil == this.node {
         return this
     }
     
-    return NewHandle(this.node.PreviousSibling())
+    return NewHandle(this.node.Prev())
 }
 
-func (this *xmlHandleImpl) NextSibling() XMLHandle {
+func (this *xmlHandleImpl) Next() XMLHandle {
     if nil == this.node {
         return this
     }
     
-    return NewHandle(this.node.NextSibling())
+    return NewHandle(this.node.Next())
 }
 
 func (this *xmlHandleImpl) FirstChildElement(name string) XMLHandle {
@@ -1009,20 +1072,20 @@ func (this *xmlHandleImpl) LastChildElement(name string) XMLHandle {
     return NewHandle(this.node.LastChildElement(name))
 }
 
-func (this *xmlHandleImpl) PreviousSiblingElement(name string) XMLHandle {
+func (this *xmlHandleImpl) PrevElement(name string) XMLHandle {
     if nil == this.node {
         return this
     }
     
-    return NewHandle(this.node.PreviousSiblingElement(name))
+    return NewHandle(this.node.PrevElement(name))
 }
 
-func (this *xmlHandleImpl) NextSiblingElement(name string) XMLHandle {
+func (this *xmlHandleImpl) NextElement(name string) XMLHandle {
     if nil == this.node {
         return this
     }
     
-    return NewHandle(this.node.NextSiblingElement(name))
+    return NewHandle(this.node.NextElement(name))
 }
 
 func (this *xmlHandleImpl) ToNode() XMLNode {
@@ -1181,4 +1244,3 @@ func EscapeText(w io.Writer, s []byte) error {
 func Version() string {
     return "1.1.0"
 }
-

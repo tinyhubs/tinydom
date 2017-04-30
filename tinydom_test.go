@@ -5,7 +5,6 @@ import (
     "os"
     "strings"
     "testing"
-    //    "bytes"
     "bytes"
     "io/ioutil"
 )
@@ -42,7 +41,7 @@ func walk(m int, rootNode XMLNode) {
     }
     
     space := strings.Repeat("  ", m)
-    for child := rootNode.FirstChild(); nil != child; child = child.NextSibling() {
+    for child := rootNode.FirstChild(); nil != child; child = child.Next() {
         fmt.Println(space, child.Value())
         walk(m+1, child)
     }
@@ -50,11 +49,11 @@ func walk(m int, rootNode XMLNode) {
 
 func Test_example2(t *testing.T) {
     doc := NewDocument()
-    doc.InsertEndChild(NewProcInst(doc, "xml", `version="1.0" encoding="UTF-8"`))
-    books := doc.InsertEndChild(NewElement(doc, "books"))
-    book := books.InsertEndChild(NewElement(doc, "book"))
-    name := book.InsertEndChild(NewElement(doc, "name"))
-    name.InsertEndChild(NewText(doc, "The Moon"))
+    doc.InsertEndChild(NewProcInst("xml", `version="1.0" encoding="UTF-8"`))
+    books := doc.InsertEndChild(NewElement("books"))
+    book := books.InsertEndChild(NewElement("book"))
+    name := book.InsertEndChild(NewElement("name"))
+    name.InsertEndChild(NewText("The Moon"))
     
     doc.Accept(NewSimplePrinter(os.Stdout, PrettyPrint))
     
@@ -140,17 +139,17 @@ func Test_Node_正常的XML文档_特殊场景_只有一个根节点(t *testing.
     expect(t, "检查节点名:node", node.Value() == "node")
     
     expect(t, "topo结构检查", doc == node.Parent())
-    expect(t, "topo结构检查", doc == node.GetDocument())
+    expect(t, "topo结构检查", doc == node.Document())
     
     expect(t, "topo结构检查", nil == node.FirstChild())
     expect(t, "topo结构检查", nil == node.LastChild())
-    expect(t, "topo结构检查", nil == node.PreviousSibling())
-    expect(t, "topo结构检查", nil == node.NextSibling())
+    expect(t, "topo结构检查", nil == node.Prev())
+    expect(t, "topo结构检查", nil == node.Next())
     
     expect(t, "topo结构检查", nil == node.FirstChildElement(""))
     expect(t, "topo结构检查", nil == node.LastChildElement(""))
-    expect(t, "topo结构检查", nil == node.PreviousSiblingElement(""))
-    expect(t, "topo结构检查", nil == node.NextSiblingElement(""))
+    expect(t, "topo结构检查", nil == node.PrevElement(""))
+    expect(t, "topo结构检查", nil == node.NextElement(""))
     
     expect(t, "转换检查", nil != node.ToElement())
     expect(t, "转换检查", nil == node.ToComment())
@@ -172,38 +171,38 @@ func Test_Node_正常的XML文档_特殊场景_只有一个子节点(t *testing.
     expect(t, "检查节点名:node", "node" == node.Value())
     
     expect(t, "topo结构检查", doc == node.Parent())
-    expect(t, "topo结构检查", doc == node.GetDocument())
+    expect(t, "topo结构检查", doc == node.Document())
     
     expect(t, "topo结构检查", elem == node.FirstChild())
     expect(t, "topo结构检查", elem == node.LastChild())
-    expect(t, "topo结构检查", nil == node.PreviousSibling())
-    expect(t, "topo结构检查", nil == node.NextSibling())
+    expect(t, "topo结构检查", nil == node.Prev())
+    expect(t, "topo结构检查", nil == node.Next())
     
     expect(t, "topo结构检查", elem.ToElement() == node.FirstChildElement(""))
     expect(t, "topo结构检查", elem.ToElement() == node.LastChildElement(""))
-    expect(t, "topo结构检查", nil == node.PreviousSiblingElement(""))
-    expect(t, "topo结构检查", nil == node.NextSiblingElement(""))
+    expect(t, "topo结构检查", nil == node.PrevElement(""))
+    expect(t, "topo结构检查", nil == node.NextElement(""))
     
     expect(t, "topo结构检查", elem.ToElement() == node.FirstChildElement("elem"))
     expect(t, "topo结构检查", elem.ToElement() == node.LastChildElement("elem"))
-    expect(t, "topo结构检查", nil == node.PreviousSiblingElement(""))
-    expect(t, "topo结构检查", nil == node.NextSiblingElement(""))
+    expect(t, "topo结构检查", nil == node.PrevElement(""))
+    expect(t, "topo结构检查", nil == node.NextElement(""))
     
     //  elem
     expect(t, "检查节点名:elem", "elem" == elem.Value())
     
     expect(t, "topo结构检查", node == elem.Parent())
-    expect(t, "topo结构检查", doc == elem.GetDocument())
+    expect(t, "topo结构检查", doc == elem.Document())
     
     expect(t, "topo结构检查", nil == elem.FirstChild())
     expect(t, "topo结构检查", nil == elem.LastChild())
-    expect(t, "topo结构检查", nil == elem.PreviousSibling())
-    expect(t, "topo结构检查", nil == elem.NextSibling())
+    expect(t, "topo结构检查", nil == elem.Prev())
+    expect(t, "topo结构检查", nil == elem.Next())
     
     expect(t, "topo结构检查", nil == elem.FirstChildElement(""))
     expect(t, "topo结构检查", nil == elem.LastChildElement(""))
-    expect(t, "topo结构检查", nil == elem.PreviousSiblingElement(""))
-    expect(t, "topo结构检查", nil == elem.NextSiblingElement(""))
+    expect(t, "topo结构检查", nil == elem.PrevElement(""))
+    expect(t, "topo结构检查", nil == elem.NextElement(""))
 }
 
 func Test_Node_正常的XML文档_丰富的文档结构(t *testing.T) {
@@ -213,8 +212,8 @@ func Test_Node_正常的XML文档_丰富的文档结构(t *testing.T) {
     
     node := doc.FirstChild()
     elem1 := node.FirstChild()
-    elem2 := elem1.NextSibling()
-    elem3 := elem2.NextSibling()
+    elem2 := elem1.Next()
+    elem3 := elem2.Next()
     
     expect(t, "检查节点顺序关系", "node" == node.Value())
     expect(t, "检查节点顺序关系", "elem1" == elem1.Value())
@@ -225,17 +224,17 @@ func Test_Node_正常的XML文档_丰富的文档结构(t *testing.T) {
     expect(t, "topo结构检查", node == elem2.Parent())
     expect(t, "topo结构检查", node == elem3.Parent())
     
-    expect(t, "topo结构检查", nil == elem1.PreviousSibling())
-    expect(t, "topo结构检查", nil == elem3.NextSibling())
+    expect(t, "topo结构检查", nil == elem1.Prev())
+    expect(t, "topo结构检查", nil == elem3.Next())
     
-    expect(t, "topo结构检查", elem1 == elem2.PreviousSibling())
-    expect(t, "topo结构检查", elem3 == elem2.NextSibling())
+    expect(t, "topo结构检查", elem1 == elem2.Prev())
+    expect(t, "topo结构检查", elem3 == elem2.Next())
     
-    expect(t, "topo结构检查", elem1.ToElement() == elem2.PreviousSiblingElement(""))
-    expect(t, "topo结构检查", elem3.ToElement() == elem2.NextSiblingElement(""))
+    expect(t, "topo结构检查", elem1.ToElement() == elem2.PrevElement(""))
+    expect(t, "topo结构检查", elem3.ToElement() == elem2.NextElement(""))
     
-    expect(t, "topo结构检查", elem1.ToElement() == elem2.PreviousSiblingElement("elem1"))
-    expect(t, "topo结构检查", elem3.ToElement() == elem2.NextSiblingElement("elem3"))
+    expect(t, "topo结构检查", elem1.ToElement() == elem2.PrevElement("elem1"))
+    expect(t, "topo结构检查", elem3.ToElement() == elem2.NextElement("elem3"))
     
     expect(t, "topo结构检查", false == node.NoChildren())
     expect(t, "topo结构检查", true == elem1.NoChildren())
@@ -250,20 +249,20 @@ func Test_Node_修改文档_节点层次的增删改(t *testing.T) {
     
     node := doc.FirstChildElement("node")
     elem1 := node.FirstChildElement("elem1")
-    elem2 := node.FirstChildElement("elem2")
+    //elem2 := node.FirstChildElement("elem2")
     
-    new1 := elem1.InsertEndChild(NewElement(doc, "new1"))
-    new2 := node.InsertEndChild(NewElement(doc, "new2"))
-    new3 := node.InsertAfterChild(elem2, NewElement(doc, "new3"))
-    new4 := elem1.InsertFirstChild(NewElement(doc, "new4"))
+    new1 := elem1.InsertEndChild(NewElement("new1"))
+    new2 := node.InsertEndChild(NewElement("new2"))
+    //    new3 := node.InsertAfterChild(elem2, NewElement(doc, "new3"))
+    new4 := elem1.InsertFirstChild(NewElement("new4"))
     expect(t, "添加成功", nil != new1)
     expect(t, "添加成功", nil != new2)
-    expect(t, "添加成功", nil != new3)
+    //    expect(t, "添加成功", nil != new3)
     expect(t, "添加成功", nil != new4)
     
     doc.DeleteChild(new1)
     doc.DeleteChild(new2)
-    doc.DeleteChild(new3)
+    //    doc.DeleteChild(new3)
     doc.DeleteChild(new4)
     node.DeleteChildren()
     
@@ -375,7 +374,7 @@ func Test_ProcInst_基本功能测试(t *testing.T) {
     expect(t, "有申明头的xml文档，第一个子节点是申明头", "xml" == procInst.Value())
     expect(t, "有申明头的xml文档，第一个子节点是申明头", "xml" == procInst.Target())
     expect(t, "有申明头的xml文档，第一个子节点是申明头", `version="1.0" encoding="UTF-8"` == procInst.Instruction())
-    expect(t, "申明头下面一个是node", "node" == procInst.NextSibling().Value())
+    expect(t, "申明头下面一个是node", "node" == procInst.Next().Value())
 }
 
 func Test_Comment_基本功能测试(t *testing.T) {
@@ -405,7 +404,7 @@ func Test_Comment_基本功能测试(t *testing.T) {
     expect(t, "修改注释内容", "New\nComment" == comment1.Comment())
     
     //  添加注释
-    comment3 := NewComment(doc, "Comment3")
+    comment3 := NewComment("Comment3")
     doc.FirstChildElement("").InsertEndChild(comment3)
     expect(t, "向文档添加注释", "Comment3" == doc.FirstChildElement("").LastChild().Value())
 }
@@ -444,7 +443,7 @@ func Test_Text_基本功能测试(t *testing.T) {
     //  获得Text对象
     text1 := node.FirstChild()
     text2 := elem1.FirstChild()
-    text3 := elem1.NextSibling()
+    text3 := elem1.Next()
     text4 := elem2.FirstChild()
     expect(t, "获得Text对象", nil != text1)
     expect(t, "获得Text对象", nil != text2)
@@ -502,7 +501,7 @@ func Test_Directive_基本功能测试(t *testing.T) {
     expect(t, "返回值检测", nil == err)
     
     //  转换
-    doctype := doc.FirstChild().NextSibling()
+    doctype := doc.FirstChild().Next()
     expect(t, "转换测试", nil != doctype.ToDirective())
     expect(t, "转换测试", nil == doctype.ToText())
     expect(t, "转换测试", nil == doctype.ToComment())
@@ -530,12 +529,12 @@ func Test_Handle_空腹测试(t *testing.T) {
     
     expect(t, "空周游测试", nil == handle.FirstChild().ToNode())
     expect(t, "空周游测试", nil == handle.LastChild().ToNode())
-    expect(t, "空周游测试", nil == handle.PreviousSibling().ToNode())
-    expect(t, "空周游测试", nil == handle.NextSibling().ToNode())
+    expect(t, "空周游测试", nil == handle.Prev().ToNode())
+    expect(t, "空周游测试", nil == handle.Next().ToNode())
     expect(t, "空周游测试", nil == handle.FirstChildElement("").ToNode())
     expect(t, "空周游测试", nil == handle.LastChildElement("").ToNode())
-    expect(t, "空周游测试", nil == handle.PreviousSiblingElement("").ToNode())
-    expect(t, "空周游测试", nil == handle.NextSiblingElement("").ToNode())
+    expect(t, "空周游测试", nil == handle.PrevElement("").ToNode())
+    expect(t, "空周游测试", nil == handle.NextElement("").ToNode())
 }
 
 func Test_Handle_基本功能测试(t *testing.T) {
@@ -555,20 +554,20 @@ func Test_Handle_基本功能测试(t *testing.T) {
     handle := NewHandle(doc)
     expect(t, "周游测试", nil != handle.ToDocument())
     expect(t, "周游测试", "xml" == handle.FirstChild().ToProcInst().Value())
-    expect(t, "周游测试", "comment1" == handle.FirstChild().NextSibling().ToComment().Value())
+    expect(t, "周游测试", "comment1" == handle.FirstChild().Next().ToComment().Value())
     
     node := handle.FirstChildElement("node")
     expect(t, "周游测试", nil != node.Parent().ToDocument())
     expect(t, "周游测试", "" == node.FirstChildElement("elem").ToElement().Text())
     expect(t, "周游测试", "126" == node.LastChildElement("elem").ToElement().Text())
-    expect(t, "周游测试", "" == node.LastChildElement("elem").PreviousSiblingElement("elem").ToElement().Text())
-    expect(t, "周游测试", "126" == node.FirstChildElement("elem").NextSiblingElement("elem").ToElement().Text())
+    expect(t, "周游测试", "" == node.LastChildElement("elem").PrevElement("elem").ToElement().Text())
+    expect(t, "周游测试", "126" == node.FirstChildElement("elem").NextElement("elem").ToElement().Text())
     expect(t, "周游测试", "126" == node.LastChildElement("elem").FirstChild().ToText().Value())
     expect(t, "周游测试", "126" == node.LastChildElement("elem").LastChild().ToText().Value())
     
     str := node.FirstChildElement("str")
-    expect(t, "周游测试", "elem" == str.PreviousSibling().ToElement().Value())
-    expect(t, "周游测试", nil != handle.FirstChildElement("node").PreviousSibling().ToDirective())
+    expect(t, "周游测试", "elem" == str.Prev().ToElement().Value())
+    expect(t, "周游测试", nil != handle.FirstChildElement("node").Prev().ToDirective())
 }
 
 func Test_Node_修改文档_对新添加的节点进行修改(t *testing.T) {
@@ -603,20 +602,12 @@ func Test_TODO_Node_将另外一个文档的node添加到本文档(t *testing.T)
 
 func Test_Print(t *testing.T) {
     
-    s := `<?xml version="1.0" encoding="UTF-8"?><module><changes><change sequence="0000&amp;00000"/><change >@properties.insert "${ITPAAS_HONE}/cloudcontrol/conf-itpaas/database/ccc.properties" &amp; "key" &quot; "value"</change></changes></module><!--  ddd  -->`
-    
-    doc, err := LoadDocument(strings.NewReader(s))
-    if nil != err {
-        t.Fail()
-        return
-    }
-    
-    fmt.Println("=========================================================")
-    //opt := PrintOptions{Indent: []byte(""), TextWrapWidth: 200}
-    opt := PrintOptions{}
-    doc.Accept(NewSimplePrinter(os.Stdout, opt))
-    //doc.Accept(NewSimplePrinter(os.Stdout, StreamPrint))
-    fmt.Println("\n=========================================================\n")
+    str := `<?xml version="1.0" encoding="UTF-8"?><module><changes><change sequence="0000&amp;00000"/><change >@properties.insert "${ITPAAS_HONE}/cloudcontrol/conf-itpaas/database/ccc.properties" &amp; "key" &quot; "value"</change></changes></module><!--  ddd  -->`
+    exp := `<?xml version="1.0" encoding="UTF-8"?><module><changes><change sequence="0000&amp;00000"/><change>@properties.insert "${ITPAAS_HONE}/cloudcontrol/conf-itpaas/database/ccc.properties" &amp; "key" " "value"</change></changes></module><!--  ddd  -->`
+    doc, _ := LoadDocument(strings.NewReader(str))
+    buf := bytes.NewBufferString("")
+    doc.Accept(NewSimplePrinter(buf, PrintOptions{}))
+    expect(t, "检查格式化xml文档的结果", buf.String() == exp)
 }
 
 func Test_Version(t *testing.T) {
@@ -642,7 +633,7 @@ func Test_EscapeAttribute(t *testing.T) {
             return
         }
         
-        elem := NewElement(doc, "elem")
+        elem := NewElement("elem")
         elem.SetAttribute("attr", str)
         doc.InsertEndChild(elem)
         
@@ -665,7 +656,6 @@ func Test_EscapeAttribute(t *testing.T) {
     tester(`aaa>aaa`, `aaa>aaa`)
 }
 
-
 func Test_EscapeText(t *testing.T) {
     
     tester := func(str string, esc string) {
@@ -675,7 +665,7 @@ func Test_EscapeText(t *testing.T) {
             return
         }
         
-        elem := NewElement(doc, "elem")
+        elem := NewElement("elem")
         doc.InsertEndChild(elem)
         elem.SetText(str)
         
@@ -696,4 +686,69 @@ func Test_EscapeText(t *testing.T) {
     tester("\raaa", "\raaa")
     tester(`aaa'`, `aaa'`)
     tester(`aaa>aaa`, `aaa>aaa`)
+}
+
+func Test_Inserts(t *testing.T) {
+    doc := NewDocument()
+    doc.InsertEndChild(NewElement("elem1")). //  <elem1></elem1>
+        InsertFirstChild(NewElement("elem2")). //  <elem1><elem2></elem2></elem1>
+        InsertFront(NewElement("elem3")). //  <elem1><elem3></elem3><elem2></elem2></elem1>
+        InsertBack(NewElement("elem4")). //  <elem1><elem3></elem3><elem4></elem4><elem2></elem2></elem1>
+        InsertElementFront("elem5"). //  <elem1><elem3></elem3><elem5></elem5><elem4></elem4><elem2></elem2></elem1>
+        InsertElementBack("elem6"). //  <elem1><elem3></elem3><elem5></elem5><elem6></elem6><elem4></elem4><elem2></elem2></elem1>
+        InsertElementEndChild("elem7"). //  <elem1><elem3></elem3><elem5></elem5><elem6><elem7><elem8></elem8></elem7></elem6><elem4></elem4><elem2></elem2></elem1>
+        InsertElementFirstChild("elem8").
+        InsertEndChild(NewElement("elem9")).
+        InsertBack(NewElement("elem10"))
+    
+    exp := `<elem1><elem3/><elem5/><elem6><elem7><elem8><elem9/><elem10/></elem8></elem7></elem6><elem4/><elem2/></elem1>`
+    
+    buf := bytes.NewBufferString("")
+    doc.Accept(NewSimplePrinter(buf, StreamPrint))
+    fmt.Println("pppp", buf.String())
+    expect(t, "检查格式化输出结果", exp == buf.String())
+}
+
+//func Test_Inserts2(t *testing.T) {
+//    doc := NewDocument()
+//    elem1 := doc.InsertEndChild(NewElement("elem1"))     //  <elem1></elem1>
+//    elem2 := elem1.InsertFirstChild(NewElement("elem2")) //  <elem1><elem2></elem2></elem1>
+//    elem3 := elem2.InsertFront(NewElement("elem3"))      //  <elem1><elem3></elem3><elem2></elem2></elem1>
+//    elem4 := elem3.InsertBack(NewElement("elem4"))       //  <elem1><elem3></elem3><elem4></elem4><elem2></elem2></elem1>
+//    elem5 := elem4.InsertElementFront("elem5")           //  <elem1><elem3></elem3><elem5></elem5><elem4></elem4><elem2></elem2></elem1>
+//
+//    doc.Accept(NewSimplePrinter(os.Stdout, StreamPrint))
+//    fmt.Println("------------")
+//    fmt.Println("elem5", elem5)
+//}
+//
+//func Test_Inserts3(t *testing.T) {
+//    doc := NewDocument()
+//    elem1 := doc.InsertEndChild(NewElement("elem1"))     //  <elem1></elem1>
+//    elem2 := elem1.InsertFirstChild(NewElement("elem2")) //  <elem1><elem2></elem2></elem1>
+//    elem3 := elem2.InsertElementFront("elem3")            //  <elem1><elem3></elem3><elem2></elem2></elem1>
+//    elem4 := elem2.InsertElementFront("elem4")            //  <elem1><elem3></elem3><elem4></elem4><elem2></elem2></elem1>
+//
+//    doc.Accept(NewSimplePrinter(os.Stdout, StreamPrint))
+//    fmt.Println("------------")
+//    fmt.Println("elem5", elem4, elem3)
+//}
+
+func Test_XmlHandle_Parent_NULL(t *testing.T) {
+    doc, _ := LoadDocument(bytes.NewBufferString(`<elem1/>`))
+    nd := NewHandle(doc).FirstChild().Parent().Parent().Parent().ToNode()
+    expect(t, "Document的上层只能为null", nil == nd)
+}
+
+func Test_Accept_Terminate(t *testing.T) {
+
+}
+
+
+func Test_Document_Cannot_Add_Sibling(t *testing.T) {
+    doc := NewDocument()
+    elem1 := doc.InsertBack(NewElement("elem1"))
+    expect(t, "document 不能添加兄弟节点", nil == elem1)
+    elem2 := doc.InsertFront(NewElement("elem2"))
+    expect(t, "document 不能添加兄弟节点", nil == elem2)
 }

@@ -37,7 +37,7 @@ import "tinydom"
 doc, err := tinydom.LoadDocument(strings.NewReader(s))
 ```
 
-`FirstChildElement`、`LastChildElement`、`PreviousSiblingElement`、`NextSiblingElement`这几个函数，主要是为了方便查找`XMLElement`元素，
+`FirstChildElement`、`LastChildElement`、`PrevElement`、`NextElement`这几个函数，主要是为了方便查找`XMLElement`元素，
 大部分情况下我们建立XML文档的DOM模型就是为了对XMLElement进行访问。
 
 ```go
@@ -66,9 +66,9 @@ fmt.Println(elem2.Text()) //	Suny
 
 - 获取相邻节点
 
-`PreviousSibling`、`NextSibling`这两个函数用于查找当前节点的前一个或者后一个兄弟节点.
+`Prev`、`Next`这两个函数用于查找当前节点的前一个或者后一个兄弟节点.
 
-`PreviousSiblingElement`、`NextSiblingElement`这两个函数用于查找当前节点的上一个或者下一个Element节点.
+`PrevElement`、`NextElement`这两个函数用于查找当前节点的上一个或者下一个Element节点.
 我们同样可以通过指定这两个函数的name参数来查找执行名字的Element节点.
 
 - 获取父节点
@@ -105,7 +105,7 @@ fmt.Println(elem2.Text()) //	Suny
 
 
 ##  文档的遍历
-`Parent`、`FirstChild`、`LastChild`、`PreviousSibling`、`NextSibling`用于使我们可以方便地在XML的DOM树中游走。
+`Parent`、`FirstChild`、`LastChild`、`Prev`、`Next`用于使我们可以方便地在XML的DOM树中游走。
 下面这个函数可以用于对一个doc进行遍历：
 
 ```go
@@ -113,7 +113,7 @@ func walk(m int , rootNode tinydom.XMLNode) {
     if nil == rootNode {
         return
     }
-    for child := rootNode.FirstChild(); nil != child; child = child.NextSibling() {
+    for child := rootNode.FirstChild(); nil != child; child = child.Next() {
         fmt.Println(strings.Repeat(" ", m), child.Value())
         walk(m + 1, child)
     }
@@ -149,7 +149,7 @@ tinydom提供了一系列的NewXXX方法用于创建各种不同类型的节点:
 
 - 将node添加为本节点的第一个子节点:`tinydom.InsertFirstChild(node XMLNode) XMLNode`
 
-- 将addThis添加到本节点的子节点afterThis的前面:`tinydom.InsertAfterChild(afterThis XMLNode, addThis XMLNode) XMLNode`
+//- 将addThis添加到本节点的子节点afterThis的前面:`tinydom.InsertAfterChild(afterThis XMLNode, addThis XMLNode) XMLNode`
 
 - 删除所有的子节点:`tinydom.DeleteChildren()`
 
@@ -265,6 +265,9 @@ golang的xml解析器自身还不支持BOM，所以本解析器还无法解析�
 
 - 文档输出增加打印选项控制,支持"优美打印" <font color="red">`接口变更`</font> `NewSimplePrinter`
 - 优化字符转义切新增转义处理的接口 `tinydom.ExcapeText` `tinydom.ExcapeAttribute`
+- 简化接口 `Previous` 缩写为 `Prev`,`Sibling`单词从所有接口中删除
+- 删除接口 `InsertAfterChild` 建议使用 `InsertNext` 或者 `InsertElementNext` 代替
+- 增加接口 ``
 - 解决用例稳定性问题
 - 取消支持go-1.4.x版本 `因为该版本没有覆盖率统计工具`
 - 完善文档
