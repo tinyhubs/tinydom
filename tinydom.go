@@ -182,7 +182,7 @@ func (a *xmlAttributeImpl) SetValue(newValue string) {
 //==================================================================
 
 type xmlNodeImpl struct {
-    impl_ XMLNode
+    implobj XMLNode
     
     document XMLDocument
     parent   XMLNode
@@ -212,7 +212,7 @@ func (n *xmlNodeImpl) setDocument(doc XMLDocument) {
 }
 
 func (n *xmlNodeImpl) impl() XMLNode {
-    return n.impl_
+    return n.implobj
 }
 
 func (n *xmlNodeImpl) ToElement() XMLElement {
@@ -384,7 +384,7 @@ func (n *xmlNodeImpl) InsertEndChild(addThis XMLNode) XMLNode {
         addThis.setNext(nil)
     }
     
-    addThis.setParent(n.impl_)
+    addThis.setParent(n.implobj)
     addThis.setDocument(n.document)
     return addThis
 }
@@ -405,14 +405,14 @@ func (n *xmlNodeImpl) InsertFirstChild(addThis XMLNode) XMLNode {
         addThis.setNext(nil)
     }
     
-    addThis.setParent(n.impl_)
+    addThis.setParent(n.implobj)
     addThis.setDocument(n.document)
     return addThis
 }
 
 func (n *xmlNodeImpl) insertAfterChild(afterThis XMLNode, addThis XMLNode) XMLNode {
     
-    //if afterThis.Parent() != a.impl_ {
+    //if afterThis.Parent() != a.implobj {
     //    return nil
     //}
     
@@ -426,7 +426,7 @@ func (n *xmlNodeImpl) insertAfterChild(afterThis XMLNode, addThis XMLNode) XMLNo
     addThis.setNext(afterThis.Next())
     afterThis.Next().setPrev(addThis)
     afterThis.setNext(addThis)
-    addThis.setParent(n.impl_)
+    addThis.setParent(n.implobj)
     addThis.setDocument(n.document)
     
     return addThis
@@ -434,7 +434,7 @@ func (n *xmlNodeImpl) insertAfterChild(afterThis XMLNode, addThis XMLNode) XMLNo
 
 func (n *xmlNodeImpl) insertBeforeChild(beforeThis XMLNode, addThis XMLNode) XMLNode {
     
-    //if beforeThis.Parent() != a.impl_ {
+    //if beforeThis.Parent() != a.implobj {
     //    return nil
     //}
     
@@ -448,7 +448,7 @@ func (n *xmlNodeImpl) insertBeforeChild(beforeThis XMLNode, addThis XMLNode) XML
     addThis.setNext(beforeThis)
     beforeThis.Prev().setNext(addThis)
     beforeThis.setPrev(addThis)
-    addThis.setParent(n.impl_)
+    addThis.setParent(n.implobj)
     addThis.setDocument(n.document)
     
     return addThis
@@ -740,7 +740,7 @@ func (d *xmlDirectiveImpl) Accept(visitor XMLVisitor) bool {
 //	NewText	创建一个新的XMLText对象
 func NewText(text string) XMLText {
     node := new(xmlTextImpl)
-    node.impl_ = node
+    node.implobj = node
     node.value = text
     return node
 }
@@ -748,7 +748,7 @@ func NewText(text string) XMLText {
 //	XMLComment	创建一个新的XMLComment对象
 func NewComment(comment string) XMLComment {
     node := new(xmlCommentImpl)
-    node.impl_ = node
+    node.implobj = node
     node.value = comment
     return node
 }
@@ -756,7 +756,7 @@ func NewComment(comment string) XMLComment {
 //	NewElement	创建一个新的XMLElement对象
 func NewElement(name string) XMLElement {
     node := new(xmlElementImpl)
-    node.impl_ = node
+    node.implobj = node
     node.value = name
     node.attributes = make(map[string]XMLAttribute)
     return node
@@ -765,7 +765,7 @@ func NewElement(name string) XMLElement {
 //	NewProcInst	创建一个新的XMLProcInst对象
 func NewProcInst(target string, inst string) XMLProcInst {
     node := new(xmlProcInstImpl)
-    node.impl_ = node
+    node.implobj = node
     node.value = target
     node.instruction = inst
     return node
@@ -774,7 +774,7 @@ func NewProcInst(target string, inst string) XMLProcInst {
 //	NewDirective	创建一个新的XMLDirective对象
 func NewDirective(directive string) XMLDirective {
     node := new(xmlDirectiveImpl)
-    node.impl_ = node
+    node.implobj = node
     node.value = directive
     return node
 }
@@ -791,7 +791,7 @@ func newAttribute(name string, value string) XMLAttribute {
 //	NewDocument	创建一个全新的XMLDocument对象
 func NewDocument() XMLDocument {
     doc := new(xmlDocumentImpl)
-    doc.impl_ = doc
+    doc.implobj = doc
     doc.document = doc
     return doc
 }
