@@ -18,7 +18,7 @@ type XMLAttribute interface {
 	SetValue(string)
 }
 
-//  XMLNode 定义了XML所有节点的基础设施，提供了基本的元素遍历、增删等操作,也提供了逆向转换能力.
+// XMLNode 定义了XML所有节点的基础设施，提供了基本的元素遍历、增删等操作,也提供了逆向转换能力.
 type XMLNode interface {
 	ToElement() XMLElement
 	ToText() XMLText
@@ -72,7 +72,7 @@ type XMLNode interface {
 	unlink(child XMLNode)
 }
 
-//  XMLElement  提供了访问XML基本节点元素的能力
+// XMLElement  提供了访问XML基本节点元素的能力
 //
 //  Name、SetName其实是Value和SetValue的别名，目的是为了使得接口更加符合直观理解。
 //
@@ -100,38 +100,38 @@ type XMLElement interface {
 	SetText(text string)
 }
 
-//  XMLText 提供了对XML元素间文本的封装
+// XMLText 提供了对XML元素间文本的封装
 type XMLText interface {
 	XMLNode
 	SetCDATA(isCData bool)
 	CDATA() bool
 }
 
-//  XMLComment 提供了对注释的封装
+// XMLComment 提供了对注释的封装
 type XMLComment interface {
 	XMLNode
 	Comment() string
 	SetComment(string)
 }
 
-//  XMLProcInst 常用于表达XML处理指令,类似:<?xml version="1.0" encoding="UTF-8"?>
+// XMLProcInst 常用于表达XML处理指令,类似:<?xml version="1.0" encoding="UTF-8"?>
 type XMLProcInst interface {
 	XMLNode
 	Target() string
 	Instruction() string
 }
 
-//  XMLDirective 用于表达`<!`与`>`之间的部分，一般为DTD
+// XMLDirective 用于表达`<!`与`>`之间的部分，一般为DTD
 type XMLDirective interface {
 	XMLNode
 }
 
-//  XMLDocument 用于表达一个XML文档,这是整个XML文档的根
+// XMLDocument 用于表达一个XML文档,这是整个XML文档的根
 type XMLDocument interface {
 	XMLNode
 }
 
-//  XMLVisitor XML文档访问器,常用于遍历文档或者格式化输出XML文档
+// XMLVisitor XML文档访问器,常用于遍历文档或者格式化输出XML文档
 type XMLVisitor interface {
 	VisitEnterDocument(XMLDocument) bool
 	VisitExitDocument(XMLDocument) bool
@@ -145,7 +145,7 @@ type XMLVisitor interface {
 	VisitDirective(XMLDirective) bool
 }
 
-//  XMLHandle XML文档处理器,其主要
+// XMLHandle XML文档处理器,其主要
 type XMLHandle interface {
 	Parent() XMLHandle
 	FirstChild() XMLHandle
