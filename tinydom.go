@@ -106,6 +106,7 @@ type XMLText interface {
     CDATA() bool
 }
 
+//  XMLComment 提供了对注释的封装
 type XMLComment interface {
     XMLNode
     Comment() string
@@ -126,6 +127,7 @@ type XMLDocument interface {
     XMLNode
 }
 
+//  XMLVisitor XML文档访问器,常用于遍历文档或者格式化输出XML文档
 type XMLVisitor interface {
     VisitEnterDocument(XMLDocument) bool
     VisitExitDocument(XMLDocument) bool
@@ -139,6 +141,7 @@ type XMLVisitor interface {
     VisitDirective(XMLDirective) bool
 }
 
+//  XMLHandle XML文档处理器,其主要
 type XMLHandle interface {
     Parent() XMLHandle
     FirstChild() XMLHandle
