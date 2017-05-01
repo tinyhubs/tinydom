@@ -751,7 +751,7 @@ func NewText(text string) XMLText {
 	return node
 }
 
-// XMLComment 创建一个新的XMLComment对象
+// NewComment 创建一个新的XMLComment对象
 func NewComment(comment string) XMLComment {
 	node := new(xmlCommentImpl)
 	node.implobj = node
@@ -1221,7 +1221,7 @@ func EscapeAttribute(w io.Writer, s []byte) error {
 	return nil
 }
 
-// EscapeAttribute 对文本内容进行转义,常用于自定义文档输出格式
+// EscapeText 对文本内容进行转义,常用于自定义文档输出格式
 func EscapeText(w io.Writer, s []byte) error {
 	var esc []byte
 	last := 0
