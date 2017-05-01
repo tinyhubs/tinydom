@@ -113,16 +113,19 @@ type XMLComment interface {
     SetComment(string)
 }
 
+//  XMLProcInst 常用于表达XML处理指令,类似:<?xml version="1.0" encoding="UTF-8"?>
 type XMLProcInst interface {
     XMLNode
     Target() string
     Instruction() string
 }
 
+//  XMLDirective 用于表达`<!`与`>`之间的部分，一般为DTD
 type XMLDirective interface {
     XMLNode
 }
 
+//  XMLDocument 用于表达一个XML文档,这是整个XML文档的根
 type XMLDocument interface {
     XMLNode
 }
@@ -884,6 +887,7 @@ type xmlSimplePrinter struct {
     lineHold    bool         //  暂停换行
 }
 
+//  PrintOptions    The options of NewSimplePrinter
 type PrintOptions struct {
     Indent        []byte //  缩进前缀,只允许填写tab或者空白,如果Indent长度为0表示折行但是不缩进,如果Indent为null表示不折行
     TextWrapWidth int    //  超过多长才强制换行
