@@ -10,8 +10,8 @@ import (
 )
 
 // XMLAttribute 是一个元素的属性的接口.
-//
-//  这是一份关于属性的注释.
+// 
+// 这是一份关于属性的注释.
 type XMLAttribute interface {
 	Name() string
 	Value() string
@@ -60,7 +60,7 @@ type XMLNode interface {
 
 	Accept(visitor XMLVisitor) bool
 
-	//  被迫入侵的接口
+	// 被迫入侵的接口
 	insertBeforeChild(beforeThis XMLNode, addThis XMLNode) XMLNode
 	insertAfterChild(afterThis XMLNode, addThis XMLNode) XMLNode
 	setParent(node XMLNode)
@@ -73,14 +73,14 @@ type XMLNode interface {
 }
 
 // XMLElement  提供了访问XML基本节点元素的能力
-//
-//  Name、SetName其实是Value和SetValue的别名，目的是为了使得接口更加符合直观理解。
-//
-//  Text、SetText的作用是设置<node>与</node>之间的文字，虽然文字都是有XMLText对象来承载的，但是通常来说直接在XMLElement中访问会更加方便。
-//
-//  FindAttribute和ForeachAttribute分别用于查找特定的XML节点的属性和遍历XML属性列表。
-//
-//  Attribute、SetAttribute、DeleteAttribute用于读取和删除属性。
+// 
+// Name、SetName其实是Value和SetValue的别名，目的是为了使得接口更加符合直观理解。
+// 
+// Text、SetText的作用是设置<node>与</node>之间的文字，虽然文字都是有XMLText对象来承载的，但是通常来说直接在XMLElement中访问会更加方便。
+// 
+// FindAttribute和ForeachAttribute分别用于查找特定的XML节点的属性和遍历XML属性列表。
+// 
+// Attribute、SetAttribute、DeleteAttribute用于读取和删除属性。
 type XMLElement interface {
 	XMLNode
 
@@ -166,7 +166,7 @@ type XMLHandle interface {
 	ToDirective() XMLDirective
 }
 
-//=========================================================
+// =========================================================
 
 type xmlAttributeImpl struct {
 	name  string
@@ -185,7 +185,7 @@ func (a *xmlAttributeImpl) SetValue(newValue string) {
 	a.value = newValue
 }
 
-//==================================================================
+// ==================================================================
 
 type xmlNodeImpl struct {
 	implobj XMLNode
@@ -418,9 +418,9 @@ func (n *xmlNodeImpl) InsertFirstChild(addThis XMLNode) XMLNode {
 
 func (n *xmlNodeImpl) insertAfterChild(afterThis XMLNode, addThis XMLNode) XMLNode {
 
-	//if afterThis.Parent() != a.implobj {
-	//    return nil
-	//}
+	// if afterThis.Parent() != a.implobj {
+	// return nil
+	// }
 
 	if afterThis.Next() == nil {
 		return n.InsertEndChild(addThis)
@@ -440,9 +440,9 @@ func (n *xmlNodeImpl) insertAfterChild(afterThis XMLNode, addThis XMLNode) XMLNo
 
 func (n *xmlNodeImpl) insertBeforeChild(beforeThis XMLNode, addThis XMLNode) XMLNode {
 
-	//if beforeThis.Parent() != a.implobj {
-	//    return nil
-	//}
+	// if beforeThis.Parent() != a.implobj {
+	// return nil
+	// }
 
 	if beforeThis.Prev() == nil {
 		return n.InsertFirstChild(addThis)
@@ -509,12 +509,12 @@ func (n *xmlNodeImpl) Accept(visitor XMLVisitor) bool {
 	return n.impl().Accept(visitor)
 }
 
-//------------------------------------------------------------------
+// ------------------------------------------------------------------
 
 type xmlElementImpl struct {
 	xmlNodeImpl
 
-	//rootAttribute XMLAttribute
+	// rootAttribute XMLAttribute
 	attributes map[string]XMLAttribute
 }
 
@@ -639,7 +639,7 @@ func (e *xmlElementImpl) ClearAttributes() {
 	e.attributes = nil
 }
 
-//------------------------------------------------------------------
+// ------------------------------------------------------------------
 
 type xmlCommentImpl struct {
 	xmlNodeImpl
@@ -661,7 +661,7 @@ func (c *xmlCommentImpl) Accept(visitor XMLVisitor) bool {
 	return visitor.VisitComment(c)
 }
 
-//------------------------------------------------------------------
+// ------------------------------------------------------------------
 
 type xmlProcInstImpl struct {
 	xmlNodeImpl
@@ -684,7 +684,7 @@ func (p *xmlProcInstImpl) Instruction() string {
 	return p.instruction
 }
 
-//------------------------------------------------------------------
+// ------------------------------------------------------------------
 
 type xmlDocumentImpl struct {
 	xmlNodeImpl
@@ -707,7 +707,7 @@ func (d *xmlDocumentImpl) Accept(visitor XMLVisitor) bool {
 	return visitor.VisitExitDocument(d)
 }
 
-//------------------------------------------------------------------
+// ------------------------------------------------------------------
 
 type xmlTextImpl struct {
 	xmlNodeImpl
@@ -727,7 +727,7 @@ func (t *xmlTextImpl) CDATA() bool {
 	return t.cdata
 }
 
-//------------------------------------------------------------------
+// ------------------------------------------------------------------
 
 type xmlDirectiveImpl struct {
 	xmlNodeImpl
@@ -741,9 +741,9 @@ func (d *xmlDirectiveImpl) Accept(visitor XMLVisitor) bool {
 	return visitor.VisitDirective(d)
 }
 
-//------------------------------------------------------------------
+// ------------------------------------------------------------------
 
-//	NewText	创建一个新的XMLText对象
+// NewText	创建一个新的XMLText对象
 func NewText(text string) XMLText {
 	node := new(xmlTextImpl)
 	node.implobj = node
@@ -751,7 +751,7 @@ func NewText(text string) XMLText {
 	return node
 }
 
-//	XMLComment	创建一个新的XMLComment对象
+// XMLComment	创建一个新的XMLComment对象
 func NewComment(comment string) XMLComment {
 	node := new(xmlCommentImpl)
 	node.implobj = node
@@ -759,7 +759,7 @@ func NewComment(comment string) XMLComment {
 	return node
 }
 
-//	NewElement	创建一个新的XMLElement对象
+// NewElement	创建一个新的XMLElement对象
 func NewElement(name string) XMLElement {
 	node := new(xmlElementImpl)
 	node.implobj = node
@@ -768,7 +768,7 @@ func NewElement(name string) XMLElement {
 	return node
 }
 
-//	NewProcInst	创建一个新的XMLProcInst对象
+// NewProcInst	创建一个新的XMLProcInst对象
 func NewProcInst(target string, inst string) XMLProcInst {
 	node := new(xmlProcInstImpl)
 	node.implobj = node
@@ -777,7 +777,7 @@ func NewProcInst(target string, inst string) XMLProcInst {
 	return node
 }
 
-//	NewDirective	创建一个新的XMLDirective对象
+// NewDirective	创建一个新的XMLDirective对象
 func NewDirective(directive string) XMLDirective {
 	node := new(xmlDirectiveImpl)
 	node.implobj = node
@@ -785,8 +785,8 @@ func NewDirective(directive string) XMLDirective {
 	return node
 }
 
-//	newAttribute	创建一个新的XMLAttribute对象.
-//	name和value分别用于指定属性的名称和值
+// newAttribute	创建一个新的XMLAttribute对象.
+// name和value分别用于指定属性的名称和值
 func newAttribute(name string, value string) XMLAttribute {
 	attr := new(xmlAttributeImpl)
 	attr.name = name
@@ -794,7 +794,7 @@ func newAttribute(name string, value string) XMLAttribute {
 	return attr
 }
 
-//	NewDocument	创建一个全新的XMLDocument对象
+// NewDocument	创建一个全新的XMLDocument对象
 func NewDocument() XMLDocument {
 	doc := new(xmlDocumentImpl)
 	doc.implobj = doc
@@ -802,7 +802,7 @@ func NewDocument() XMLDocument {
 	return doc
 }
 
-//	LoadDocument	从rd流中读取XML码流并构建成XMLDocument对象
+// LoadDocument	从rd流中读取XML码流并构建成XMLDocument对象
 func LoadDocument(rd io.Reader) (XMLDocument, error) {
 	doc := NewDocument()
 	var parent XMLNode = doc
@@ -815,13 +815,13 @@ func LoadDocument(rd io.Reader) (XMLDocument, error) {
 		case xml.StartElement:
 			startElement := token.(xml.StartElement)
 
-			//  一个XML文档只允许有唯一一个根节点
+			// 一个XML文档只允许有唯一一个根节点
 			if doc == parent {
 				if rootElemExist {
 					return nil, errors.New("Root element has been exist:" + startElement.Name.Local)
 				}
 
-				//  标记一下根节点已经存在了
+				// 标记一下根节点已经存在了
 				rootElemExist = true
 			}
 
@@ -836,7 +836,7 @@ func LoadDocument(rd io.Reader) (XMLDocument, error) {
 			parent = node
 
 		case xml.EndElement:
-			//endElement := token.(xml.EndElement)
+			// endElement := token.(xml.EndElement)
 			parent = parent.Parent()
 		case xml.Comment:
 			comment := token.(xml.Comment)
@@ -867,7 +867,7 @@ func LoadDocument(rd io.Reader) (XMLDocument, error) {
 	}
 
 	if (nil == err) || (io.EOF == err) {
-		//  不能是空文档
+		// 不能是空文档
 		if nil == doc.FirstChildElement("") {
 			return nil, errors.New("XML document missing the root element")
 		}
@@ -878,31 +878,31 @@ func LoadDocument(rd io.Reader) (XMLDocument, error) {
 	return nil, err
 }
 
-//------------------------------------------------------------------
+// ------------------------------------------------------------------
 type xmlSimplePrinter struct {
-	writer      io.Writer    //  输出目的地
-	options     PrintOptions //  格式化选项
-	level       int          //  用于缩进时指定缩进级别
-	firstPrint  bool         //  是否首次输出
-	indentBytes []byte       //  索引字符流
-	lineHold    bool         //  暂停换行
+	writer      io.Writer    // 输出目的地
+	options     PrintOptions // 格式化选项
+	level       int          // 用于缩进时指定缩进级别
+	firstPrint  bool         // 是否首次输出
+	indentBytes []byte       // 索引字符流
+	lineHold    bool         // 暂停换行
 }
 
-//  PrintOptions    打印选项,用于NewSimplePrinter函数,用于控制输出的XML内容的样式
+// PrintOptions    打印选项,用于NewSimplePrinter函数,用于控制输出的XML内容的样式
 type PrintOptions struct {
-	Indent        []byte //  缩进前缀,只允许填写tab或者空白,如果Indent长度为0表示折行但是不缩进,如果Indent为null表示不折行
-	TextWrapWidth int    //  超过多长才强制换行
+	Indent        []byte // 缩进前缀,只允许填写tab或者空白,如果Indent长度为0表示折行但是不缩进,如果Indent为null表示不折行
+	TextWrapWidth int    // 超过多长才强制换行
 }
 
 var (
-	//  PrettyPrint  预制的打印选项,采用4个空格缩进
+	// PrettyPrint  预制的打印选项,采用4个空格缩进
 	PrettyPrint = PrintOptions{Indent: []byte("    "), TextWrapWidth: 200}
 
-	//  StreamPrint 流式打印选项,不缩进,不换行,节省流量
+	// StreamPrint 流式打印选项,不缩进,不换行,节省流量
 	StreamPrint = PrintOptions{}
 )
 
-//  NewSimplePrinter 创建一个简单XML文档输出函数
+// NewSimplePrinter 创建一个简单XML文档输出函数
 func NewSimplePrinter(writer io.Writer, options PrintOptions) XMLVisitor {
 	visitor := new(xmlSimplePrinter)
 	visitor.writer = writer
@@ -1014,13 +1014,13 @@ func (p *xmlSimplePrinter) VisitDirective(node XMLDirective) bool {
 	return true
 }
 
-//------------------------------------------------------------------
+// ------------------------------------------------------------------
 
 type xmlHandleImpl struct {
 	node XMLNode
 }
 
-//      NewHandle       创建一个新的XMLHandle对象
+// NewHandle       创建一个新的XMLHandle对象
 func NewHandle(node XMLNode) XMLHandle {
 	handle := new(xmlHandleImpl)
 	handle.node = node
@@ -1151,9 +1151,9 @@ func (h *xmlHandleImpl) ToDirective() XMLDirective {
 	return h.node.ToDirective()
 }
 
-//  isInCharacterRange 这个函数是直接从xml包里面拷贝出来的
+// isInCharacterRange 这个函数是直接从xml包里面拷贝出来的
 // Decide whether the given rune is in the XML Character Range, per
-// the Char production of http://www.xml.com/axml/testaxml.htm,
+// the Char production of http:// www.xml.com/axml/testaxml.htm,
 // Section 2.2 Characters.
 func isInCharacterRange(r rune) (inrange bool) {
 	return r == 0x09 ||
@@ -1164,15 +1164,15 @@ func isInCharacterRange(r rune) (inrange bool) {
 		r >= 0x10000 && r <= 0x10FFFF
 }
 
-//  最简洁的字符
-//  字符    属性    文本    转义
-//  &       no     no     &amp;
-//  <       no     no     &lt;
-//  "       no     yes    &quot;
-//  \n      no     yes    &#xA;
-//  \r      no     yes    &#xD;
-//  '       yes    yes    &apos;
-//  >       yes    yes    &gt;
+// 最简洁的字符
+// 字符    属性    文本    转义
+// &       no     no     &amp;
+// <       no     no     &lt;
+// "       no     yes    &quot;
+// \n      no     yes    &#xA;
+// \r      no     yes    &#xD;
+// '       yes    yes    &apos;
+// >       yes    yes    &gt;
 var (
 	escAmps = []byte("&amp;")
 	escLt   = []byte("&lt;")
@@ -1182,7 +1182,7 @@ var (
 	escFFFD = []byte("\uFFFD") // Unicode replacement character
 )
 
-//  EscapeAttribute 对XMLElement中的属性值进行转义,常用于自定义文档输出格式
+// EscapeAttribute 对XMLElement中的属性值进行转义,常用于自定义文档输出格式
 func EscapeAttribute(w io.Writer, s []byte) error {
 	var esc []byte
 	last := 0
@@ -1221,7 +1221,7 @@ func EscapeAttribute(w io.Writer, s []byte) error {
 	return nil
 }
 
-//  EscapeAttribute 对文本内容进行转义,常用于自定义文档输出格式
+// EscapeAttribute 对文本内容进行转义,常用于自定义文档输出格式
 func EscapeText(w io.Writer, s []byte) error {
 	var esc []byte
 	last := 0
@@ -1254,7 +1254,7 @@ func EscapeText(w io.Writer, s []byte) error {
 	return nil
 }
 
-//  Version 查询版本信息
+// Version 查询版本信息
 func Version() string {
 	return "1.1.0"
 }
