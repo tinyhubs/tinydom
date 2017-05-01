@@ -1,5 +1,4 @@
 // Package tinydom 实现了一个简单的XML的DOM树构造工具.
-// 
 package tinydom
 
 import (
@@ -10,7 +9,7 @@ import (
 	"unicode/utf8"
 )
 
-//  XMLAttribute    是一个元素的属性的接口.
+// XMLAttribute 是一个元素的属性的接口.
 //
 //  这是一份关于属性的注释.
 type XMLAttribute interface {
