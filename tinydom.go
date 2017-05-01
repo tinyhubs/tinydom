@@ -1,4 +1,3 @@
-
 //Package tinydom	实现了一个简单的XML的DOM树构造工具.
 package tinydom
 
@@ -887,17 +886,21 @@ type xmlSimplePrinter struct {
     lineHold    bool         //  暂停换行
 }
 
-//  PrintOptions    The options of NewSimplePrinter
+//  PrintOptions    打印选项,用于NewSimplePrinter函数,用于控制输出的XML内容的样式
 type PrintOptions struct {
     Indent        []byte //  缩进前缀,只允许填写tab或者空白,如果Indent长度为0表示折行但是不缩进,如果Indent为null表示不折行
     TextWrapWidth int    //  超过多长才强制换行
 }
 
 var (
-    PrettyPrint = PrintOptions{Indent: []byte("    "), TextWrapWidth: 200} //  优美打印
-    StreamPrint = PrintOptions{}                                           //  流式打印
+    //  PrettyPrint  预制的打印选项,采用4个空格缩进
+    PrettyPrint = PrintOptions{Indent: []byte("    "), TextWrapWidth: 200}
+    
+    //  StreamPrint 流式打印选项,不缩进,不换行,节省流量
+    StreamPrint = PrintOptions{}
 )
 
+//  NewSimplePrinter 创建一个简单XML文档输出函数
 func NewSimplePrinter(writer io.Writer, options PrintOptions) XMLVisitor {
     visitor := new(xmlSimplePrinter)
     visitor.writer = writer
@@ -1176,6 +1179,7 @@ var (
     escFFFD = []byte("\uFFFD") // Unicode replacement character
 )
 
+//  EscapeAttribute 对XMLElement中的属性值进行转义,常用于自定义文档输出格式
 func EscapeAttribute(w io.Writer, s []byte) error {
     var esc []byte
     last := 0
@@ -1214,6 +1218,7 @@ func EscapeAttribute(w io.Writer, s []byte) error {
     return nil
 }
 
+//  EscapeAttribute 对文本内容进行转义,常用于自定义文档输出格式
 func EscapeText(w io.Writer, s []byte) error {
     var esc []byte
     last := 0
@@ -1246,6 +1251,7 @@ func EscapeText(w io.Writer, s []byte) error {
     return nil
 }
 
+//  Version 查询版本信息
 func Version() string {
     return "1.1.0"
 }
