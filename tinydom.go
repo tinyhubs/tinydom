@@ -1,6 +1,5 @@
 // Package tinydom 实现了一个简单的XML的DOM树构造工具.
 //
-// 实现了一个简单的XML的DOM树构造工具.
 package tinydom
 
 import (
