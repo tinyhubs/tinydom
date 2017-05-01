@@ -1024,6 +1024,7 @@ type xmlHandleImpl struct {
 	node XMLNode
 }
 
+//      NewHandle       创建一个新的XMLHandle对象
 func NewHandle(node XMLNode) XMLHandle {
 	handle := new(xmlHandleImpl)
 	handle.node = node

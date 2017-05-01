@@ -1,9 +1,6 @@
 # Overview 
 
-[![Build Status](https://travis-ci.org/libbylg/tinydom.svg?branch=master)](https://travis-ci.org/libbylg/tinydom)
-[![GoDoc](https://godoc.org/github.com/libbylg/tinydom?status.svg)](https://godoc.org/github.com/libbylg/tinydom)
-[![Language](https://img.shields.io/badge/language-go-lightgrey.svg)](https://github.com/libbylg/tinydom)
-[![License](https://img.shields.io/badge/license-New%20BSD-yellow.svg?style=flat)](LICENSE)
+[![Build Status](https://travis-ci.org/libbylg/tinydom.svg?branch=master)](https://travis-ci.org/libbylg/tinydom) [![GoDoc](https://godoc.org/github.com/libbylg/tinydom?status.svg)](https://godoc.org/github.com/libbylg/tinydom) [![Language](https://img.shields.io/badge/language-go-lightgrey.svg)](https://github.com/libbylg/tinydom) [![License](https://img.shields.io/badge/license-New%20BSD-yellow.svg?style=flat)](LICENSE)
 [![codecov](https://codecov.io/gh/libbylg/tinydom/branch/master/graph/badge.svg)](https://codecov.io/gh/libbylg/tinydom)
 [![goreport](https://www.goreportcard.com/badge/github.com/libbylg/tinydom)](https://www.goreportcard.com/report/github.com/libbylg/tinydom)
 
