@@ -743,7 +743,7 @@ func (d *xmlDirectiveImpl) Accept(visitor XMLVisitor) bool {
 
 // ------------------------------------------------------------------
 
-// NewText	创建一个新的XMLText对象
+// NewText 创建一个新的XMLText对象
 func NewText(text string) XMLText {
 	node := new(xmlTextImpl)
 	node.implobj = node
@@ -751,7 +751,7 @@ func NewText(text string) XMLText {
 	return node
 }
 
-// XMLComment	创建一个新的XMLComment对象
+// XMLComment 创建一个新的XMLComment对象
 func NewComment(comment string) XMLComment {
 	node := new(xmlCommentImpl)
 	node.implobj = node
@@ -759,7 +759,7 @@ func NewComment(comment string) XMLComment {
 	return node
 }
 
-// NewElement	创建一个新的XMLElement对象
+// NewElement 创建一个新的XMLElement对象
 func NewElement(name string) XMLElement {
 	node := new(xmlElementImpl)
 	node.implobj = node
@@ -768,7 +768,7 @@ func NewElement(name string) XMLElement {
 	return node
 }
 
-// NewProcInst	创建一个新的XMLProcInst对象
+// NewProcInst 创建一个新的XMLProcInst对象
 func NewProcInst(target string, inst string) XMLProcInst {
 	node := new(xmlProcInstImpl)
 	node.implobj = node
@@ -777,7 +777,7 @@ func NewProcInst(target string, inst string) XMLProcInst {
 	return node
 }
 
-// NewDirective	创建一个新的XMLDirective对象
+// NewDirective 创建一个新的XMLDirective对象
 func NewDirective(directive string) XMLDirective {
 	node := new(xmlDirectiveImpl)
 	node.implobj = node
@@ -785,7 +785,7 @@ func NewDirective(directive string) XMLDirective {
 	return node
 }
 
-// newAttribute	创建一个新的XMLAttribute对象.
+// newAttribute 创建一个新的XMLAttribute对象.
 // name和value分别用于指定属性的名称和值
 func newAttribute(name string, value string) XMLAttribute {
 	attr := new(xmlAttributeImpl)
@@ -794,7 +794,7 @@ func newAttribute(name string, value string) XMLAttribute {
 	return attr
 }
 
-// NewDocument	创建一个全新的XMLDocument对象
+// NewDocument 创建一个全新的XMLDocument对象
 func NewDocument() XMLDocument {
 	doc := new(xmlDocumentImpl)
 	doc.implobj = doc
@@ -802,7 +802,7 @@ func NewDocument() XMLDocument {
 	return doc
 }
 
-// LoadDocument	从rd流中读取XML码流并构建成XMLDocument对象
+// LoadDocument 从rd流中读取XML码流并构建成XMLDocument对象
 func LoadDocument(rd io.Reader) (XMLDocument, error) {
 	doc := NewDocument()
 	var parent XMLNode = doc
@@ -1020,7 +1020,7 @@ type xmlHandleImpl struct {
 	node XMLNode
 }
 
-// NewHandle       创建一个新的XMLHandle对象
+// NewHandle 创建一个新的XMLHandle对象
 func NewHandle(node XMLNode) XMLHandle {
 	handle := new(xmlHandleImpl)
 	handle.node = node
