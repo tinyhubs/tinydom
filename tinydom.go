@@ -911,6 +911,7 @@ type DefaultVisitor struct {
 	Directive     func(XMLDirective) bool
 }
 
+// VisitEnterDocument is the default implement of XMLVisitor
 func (v *DefaultVisitor) VisitEnterDocument(doc XMLDocument) bool {
 	if nil == v.EnterDocument {
 		return true
@@ -919,6 +920,7 @@ func (v *DefaultVisitor) VisitEnterDocument(doc XMLDocument) bool {
 	return v.EnterDocument(doc)
 }
 
+// VisitExitDocument is the default implement of XMLVisitor
 func (v *DefaultVisitor) VisitExitDocument(doc XMLDocument) bool {
 	if nil == v.ExitDocument {
 		return true
@@ -927,6 +929,7 @@ func (v *DefaultVisitor) VisitExitDocument(doc XMLDocument) bool {
 	return v.ExitDocument(doc)
 }
 
+// VisitEnterElement is the default implement of XMLVisitor
 func (v *DefaultVisitor) VisitEnterElement(elem XMLElement) bool {
 	if nil == v.EnterElement {
 		return true
@@ -935,6 +938,7 @@ func (v *DefaultVisitor) VisitEnterElement(elem XMLElement) bool {
 	return v.EnterElement(elem)
 }
 
+// VisitExitElement is the default implement of XMLVisitor
 func (v *DefaultVisitor) VisitExitElement(elem XMLElement) bool {
 	if nil == v.ExitElement {
 		return true
@@ -943,6 +947,7 @@ func (v *DefaultVisitor) VisitExitElement(elem XMLElement) bool {
 	return v.ExitElement(elem)
 }
 
+// VisitProcInst is the default implement of XMLVisitor
 func (v *DefaultVisitor) VisitProcInst(pi XMLProcInst) bool {
 	if nil == v.ProcInst {
 		return true
@@ -951,6 +956,7 @@ func (v *DefaultVisitor) VisitProcInst(pi XMLProcInst) bool {
 	return v.ProcInst(pi)
 }
 
+// VisitText is the default implement of XMLVisitor
 func (v *DefaultVisitor) VisitText(text XMLText) bool {
 	if nil == v.Text {
 		return true
@@ -959,6 +965,7 @@ func (v *DefaultVisitor) VisitText(text XMLText) bool {
 	return v.Text(text)
 }
 
+// VisitComment is the default implement of XMLVisitor
 func (v *DefaultVisitor) VisitComment(c XMLComment) bool {
 	if nil == v.Comment {
 		return true
@@ -967,6 +974,7 @@ func (v *DefaultVisitor) VisitComment(c XMLComment) bool {
 	return v.Comment(c)
 }
 
+// VisitDirective is the default implement of XMLVisitor
 func (v *DefaultVisitor) VisitDirective(d XMLDirective) bool {
 	if nil == v.Directive {
 		return true
