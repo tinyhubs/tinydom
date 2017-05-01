@@ -1,8 +1,5 @@
 // Package tinydom 实现了一个简单的XML的DOM树构造工具.
 //
-// It specifies the core Target, Triangles, Picture pattern and implements standard elements, such
-// as Sprite, Batch, Vec, Matrix and RGBA in addition to the basic Triangles and Picture
-// implementations: TrianglesData and PictureData.
 // 实现了一个简单的XML的DOM树构造工具.
 package tinydom
 
