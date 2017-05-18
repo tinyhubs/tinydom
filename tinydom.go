@@ -353,11 +353,11 @@ func (n *xmlNodeImpl) Split() XMLNode {
 }
 
 func (n *xmlNodeImpl) unlink(child XMLNode) {
-	if child == n.firstChild {
+	if child.impl() == n.firstChild {
 		n.firstChild = n.firstChild.Next()
 	}
 
-	if child == n.lastChild {
+	if child.impl() == n.lastChild {
 		n.lastChild = n.lastChild.Prev()
 	}
 
