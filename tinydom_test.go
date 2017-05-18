@@ -819,13 +819,15 @@ func Test_Node_Split(t *testing.T) {
 	<node3>
 	<!-- comment3 -->
 	</node3>
+	<!-- yyy -->
 	`
 
 	sdoc, _ := LoadDocument(bytes.NewBufferString(s))
 	rdoc, _ := LoadDocument(bytes.NewBufferString(r))
 	elem := sdoc.FirstChildElement("")
 	elem.Split()
-	sdoc.InsertEndChild(rdoc.FirstChildElement(""))
+	//sdoc.InsertEndChild(rdoc.FirstChildElement(""))
+	sdoc.InsertEndChild(rdoc.LastChildElement(""))
 
 	sdoc.Accept(NewSimplePrinter(os.Stdout, PrettyPrint))
 
