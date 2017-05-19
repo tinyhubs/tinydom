@@ -55,7 +55,7 @@ func Test_example2(t *testing.T) {
 	name := book.InsertEndChild(NewElement("name"))
 	name.InsertEndChild(NewText("The Moon"))
 
-	doc.Accept(NewSimplePrinter(os.Stdout, PrettyPrint))
+	doc.Accept(NewSimplePrinter(os.Stdout, PrintPretty))
 
 	fmt.Println()
 
@@ -80,11 +80,11 @@ func Test_example4(t *testing.T) {
 	content := doc.FirstChildElement("content")
 	fmt.Println("\nRead CDATA:", content.Text())
 	fmt.Println("\nNormal Print:")
-	doc.Accept(NewSimplePrinter(os.Stdout, PrettyPrint))
+	doc.Accept(NewSimplePrinter(os.Stdout, PrintPretty))
 	text := content.FirstChild().ToText()
 	text.SetCDATA(true)
 	fmt.Println("\nSpecial as CDATA:")
-	doc.Accept(NewSimplePrinter(os.Stdout, PrettyPrint))
+	doc.Accept(NewSimplePrinter(os.Stdout, PrintPretty))
 }
 
 func Test_Document_空文档_加载失败(t *testing.T) {
@@ -117,7 +117,7 @@ func Test_Document_输出_各种元素遍历(t *testing.T) {
 	<!DOCTYPE poem>
 	<node attr1="value1" attr2="value2"><elem><!--comment2--></elem><str>Hello world</str><hello/></node>`
 	doc, err := LoadDocument(strings.NewReader(xml))
-	doc.Accept(NewSimplePrinter(os.Stdout, StreamPrint))
+	doc.Accept(NewSimplePrinter(os.Stdout, PrintStream))
 	expect(t, "返回值检测1", nil != doc)
 	expect(t, "返回值检测2", nil == err)
 
@@ -126,7 +126,7 @@ func Test_Document_输出_各种元素遍历(t *testing.T) {
 	result2 := `<?xml version="1.0" encoding="UTF-8"?>` +
 		`<!--comment1--><!DOCTYPE poem><node attr2="value2" attr1="value1"><elem><!--comment2--></elem><str>Hello world</str><hello/></node>`
 	buf := bytes.NewBufferString("")
-	doc.Accept(NewSimplePrinter(buf, StreamPrint))
+	doc.Accept(NewSimplePrinter(buf, PrintStream))
 	expect(t, "检查输出3", (result1 == buf.String()) || (result2 == buf.String()))
 }
 
@@ -638,7 +638,7 @@ func Test_EscapeAttribute(t *testing.T) {
 		doc.InsertEndChild(elem)
 
 		buf := bytes.NewBufferString("")
-		doc.Accept(NewSimplePrinter(buf, StreamPrint))
+		doc.Accept(NewSimplePrinter(buf, PrintStream))
 
 		compare := fmt.Sprintf(`<elem attr="%s"/>`, esc)
 		if compare != buf.String() {
@@ -670,7 +670,7 @@ func Test_EscapeText(t *testing.T) {
 		elem.SetText(str)
 
 		buf := bytes.NewBufferString("")
-		doc.Accept(NewSimplePrinter(buf, StreamPrint))
+		doc.Accept(NewSimplePrinter(buf, PrintStream))
 
 		compare := fmt.Sprintf(`<elem>%s</elem>`, esc)
 		if compare != buf.String() {
@@ -691,20 +691,20 @@ func Test_EscapeText(t *testing.T) {
 func Test_Inserts(t *testing.T) {
 	doc := NewDocument()
 	doc.InsertEndChild(NewElement("elem1")). //  <elem1></elem1>
-							InsertFirstChild(NewElement("elem2")). //  <elem1><elem2></elem2></elem1>
-							InsertFront(NewElement("elem3")).      //  <elem1><elem3></elem3><elem2></elem2></elem1>
-							InsertBack(NewElement("elem4")).       //  <elem1><elem3></elem3><elem4></elem4><elem2></elem2></elem1>
-							InsertElementFront("elem5").           //  <elem1><elem3></elem3><elem5></elem5><elem4></elem4><elem2></elem2></elem1>
-							InsertElementBack("elem6").            //  <elem1><elem3></elem3><elem5></elem5><elem6></elem6><elem4></elem4><elem2></elem2></elem1>
-							InsertElementEndChild("elem7").        //  <elem1><elem3></elem3><elem5></elem5><elem6><elem7><elem8></elem8></elem7></elem6><elem4></elem4><elem2></elem2></elem1>
-							InsertElementFirstChild("elem8").
-							InsertEndChild(NewElement("elem9")).
-							InsertBack(NewElement("elem10"))
+		InsertFirstChild(NewElement("elem2")). //  <elem1><elem2></elem2></elem1>
+		InsertFront(NewElement("elem3")). //  <elem1><elem3></elem3><elem2></elem2></elem1>
+		InsertBack(NewElement("elem4")). //  <elem1><elem3></elem3><elem4></elem4><elem2></elem2></elem1>
+		InsertElementFront("elem5"). //  <elem1><elem3></elem3><elem5></elem5><elem4></elem4><elem2></elem2></elem1>
+		InsertElementBack("elem6"). //  <elem1><elem3></elem3><elem5></elem5><elem6></elem6><elem4></elem4><elem2></elem2></elem1>
+		InsertElementEndChild("elem7"). //  <elem1><elem3></elem3><elem5></elem5><elem6><elem7><elem8></elem8></elem7></elem6><elem4></elem4><elem2></elem2></elem1>
+		InsertElementFirstChild("elem8").
+		InsertEndChild(NewElement("elem9")).
+		InsertBack(NewElement("elem10"))
 
 	exp := `<elem1><elem3/><elem5/><elem6><elem7><elem8><elem9/><elem10/></elem8></elem7></elem6><elem4/><elem2/></elem1>`
 
 	buf := bytes.NewBufferString("")
-	doc.Accept(NewSimplePrinter(buf, StreamPrint))
+	doc.Accept(NewSimplePrinter(buf, PrintStream))
 	fmt.Println("pppp", buf.String())
 	expect(t, "检查格式化输出结果", exp == buf.String())
 }
@@ -717,7 +717,7 @@ func Test_Inserts(t *testing.T) {
 //    elem4 := elem3.InsertBack(NewElement("elem4"))       //  <elem1><elem3></elem3><elem4></elem4><elem2></elem2></elem1>
 //    elem5 := elem4.InsertElementFront("elem5")           //  <elem1><elem3></elem3><elem5></elem5><elem4></elem4><elem2></elem2></elem1>
 //
-//    doc.Accept(NewSimplePrinter(os.Stdout, StreamPrint))
+//    doc.Accept(NewSimplePrinter(os.Stdout, PrintStream))
 //    fmt.Println("------------")
 //    fmt.Println("elem5", elem5)
 //}
@@ -729,7 +729,7 @@ func Test_Inserts(t *testing.T) {
 //    elem3 := elem2.InsertElementFront("elem3")            //  <elem1><elem3></elem3><elem2></elem2></elem1>
 //    elem4 := elem2.InsertElementFront("elem4")            //  <elem1><elem3></elem3><elem4></elem4><elem2></elem2></elem1>
 //
-//    doc.Accept(NewSimplePrinter(os.Stdout, StreamPrint))
+//    doc.Accept(NewSimplePrinter(os.Stdout, PrintStream))
 //    fmt.Println("------------")
 //    fmt.Println("elem5", elem4, elem3)
 //}
@@ -829,6 +829,42 @@ func Test_Node_Split(t *testing.T) {
 	//sdoc.InsertEndChild(rdoc.FirstChildElement(""))
 	sdoc.InsertEndChild(rdoc.LastChildElement(""))
 
-	sdoc.Accept(NewSimplePrinter(os.Stdout, PrettyPrint))
+	buf := bytes.NewBufferString("")
+	sdoc.Accept(NewSimplePrinter(buf, PrintStream))
+	expect(t, "检查输出结果,本用例用于检测tinydom的继承机制是否完善", buf.String() == `<!-- comment1 --><node3><!-- comment3 --></node3>`)
+}
 
+type Interface interface {
+	Echo(string) string
+}
+
+type Base struct {
+	impl *Base
+}
+
+func (b*Base) Echo(s string) string {
+	return fmt.Sprintf("Base : %s", s)
+}
+
+type Div struct {
+	Base
+}
+
+func (b*Div) Echo(s string) string {
+	return fmt.Sprintf("Div : %s", s)
+}
+
+func Call(b Interface) {
+	b.Echo("hello")
+}
+
+func Test_inhert(t *testing.T) {
+	a := new(Base)
+	b := new(Div)
+	var c Interface = new(Div)
+	//d := b.(*Base) 编译失败
+	Call(a)
+	Call(b)
+	Call(c)
+	//Call(d)
 }

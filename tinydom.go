@@ -67,7 +67,7 @@ type XMLNode interface {
 	setPrev(node XMLNode)
 	setNext(node XMLNode)
 	setDocument(doc XMLDocument)
-	impl() XMLNode
+	//impl() XMLNode
 
 	unlink(child XMLNode)
 }
@@ -217,10 +217,6 @@ func (n *xmlNodeImpl) setDocument(doc XMLDocument) {
 	n.document = doc
 }
 
-func (n *xmlNodeImpl) impl() XMLNode {
-	return n.implobj
-}
-
 func (n *xmlNodeImpl) ToElement() XMLElement {
 	return nil
 }
@@ -346,18 +342,20 @@ func (n *xmlNodeImpl) NextElement(name string) XMLElement {
 func (n *xmlNodeImpl) Split() XMLNode {
 
 	if nil != n.parent {
-		n.parent.unlink(n)
+		n.parent.unlink(n.implobj)
 	}
 
-	return n
+	return n.implobj
 }
 
 func (n *xmlNodeImpl) unlink(child XMLNode) {
-	if child.impl() == n.firstChild {
+	//if child.impl() == n.firstChild {
+	if child == n.firstChild {
 		n.firstChild = n.firstChild.Next()
 	}
 
-	if child.impl() == n.lastChild {
+	//if child.impl() == n.lastChild {
+	if child == n.lastChild {
 		n.lastChild = n.lastChild.Prev()
 	}
 
@@ -506,7 +504,7 @@ func (n *xmlNodeImpl) DeleteChild(node XMLNode) {
 }
 
 func (n *xmlNodeImpl) Accept(visitor XMLVisitor) bool {
-	return n.impl().Accept(visitor)
+	return n.implobj.Accept(visitor)
 }
 
 // ------------------------------------------------------------------
@@ -1000,11 +998,11 @@ type PrintOptions struct {
 }
 
 var (
-	// PrettyPrint  预制的打印选项,采用4个空格缩进
-	PrettyPrint = PrintOptions{Indent: []byte("    "), TextWrapWidth: 200}
+	// PrintPretty  预制的打印选项,采用4个空格缩进
+	PrintPretty = PrintOptions{Indent: []byte("    "), TextWrapWidth: 200}
 
-	// StreamPrint 流式打印选项,不缩进,不换行,节省流量
-	StreamPrint = PrintOptions{}
+	// PrintStream 流式打印选项,不缩进,不换行,节省流量
+	PrintStream = PrintOptions{}
 )
 
 // NewSimplePrinter 创建一个简单XML文档输出函数
@@ -1312,7 +1310,7 @@ func EscapeAttribute(w io.Writer, s []byte) error {
 			}
 			continue
 		}
-		if _, err := w.Write(s[last : i-width]); err != nil {
+		if _, err := w.Write(s[last: i-width]); err != nil {
 			return err
 		}
 		if _, err := w.Write(esc); err != nil {
@@ -1345,7 +1343,7 @@ func EscapeText(w io.Writer, s []byte) error {
 			}
 			continue
 		}
-		if _, err := w.Write(s[last : i-width]); err != nil {
+		if _, err := w.Write(s[last: i-width]); err != nil {
 			return err
 		}
 		if _, err := w.Write(esc); err != nil {
