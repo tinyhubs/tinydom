@@ -209,8 +209,8 @@ type PrintOptions struct {
 
 为简化编码tinydom也提供了两种缺省的`PrintOptions`:
 
-- `tinydom.PrettyPrint` 优美打印: 节点输出自动折行,并按4个空格缩进
-- `tinydom.StreamPrint` 流式打印: 节点输出不带换行,除非Text部分有换行
+- `tinydom.PrintPretty` 优美打印: 节点输出自动折行,并按4个空格缩进
+- `tinydom.PrintStream` 流式打印: 节点输出不带换行,除非Text部分有换行
 
 对于自定义XML文档输出模式而言,处理XML字符转义是个麻烦,因为你必须处理一些细节.但tinydom也可在这方面帮助你.tinydom提供了
 `tinydom.EscapeAttribute`和`tinydom.EscapeText`来方便处理属性和`XMLText`中的转义字符.您也可以使用golang自带
