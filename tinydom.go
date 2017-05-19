@@ -463,7 +463,7 @@ func (n *xmlNodeImpl) InsertBack(addThis XMLNode) XMLNode {
 		return nil
 	}
 
-	return n.parent.insertAfterChild(n, addThis)
+	return n.parent.insertAfterChild(n.implobj, addThis)
 }
 
 func (n *xmlNodeImpl) InsertFront(addThis XMLNode) XMLNode {
@@ -471,7 +471,7 @@ func (n *xmlNodeImpl) InsertFront(addThis XMLNode) XMLNode {
 		return nil
 	}
 
-	return n.parent.insertBeforeChild(n, addThis)
+	return n.parent.insertBeforeChild(n.implobj, addThis)
 }
 
 func (n *xmlNodeImpl) InsertElementFront(name string) XMLElement {
