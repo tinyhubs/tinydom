@@ -8,6 +8,7 @@ import (
 	"io"
 	"unicode/utf8"
 	"container/list"
+	"os"
 )
 
 // XMLAttribute 是一个元素的属性的接口.
@@ -883,6 +884,34 @@ func LoadDocument(rd io.Reader) (XMLDocument, error) {
 	return nil, err
 }
 
+func LoadDocumentFromFile(name string) (XMLDocument, error) {
+	file, err := os.Open(name)
+	if nil != err {
+		return nil, err
+	}
+	defer file.Close()
+
+	return LoadDocument(file)
+}
+
+// SaveDocumentToFile Print the xml-dom objects to the writer.
+func SaveDocument(doc XMLDocument, writer io.Writer, options PrintOptions) error {
+	doc.Accept(NewSimplePrinter(writer, options))
+	return nil
+}
+
+// SaveDocumentToFile Print the xml-dom objects to the file.
+func SaveDocumentToFile(doc XMLDocument, name string, options PrintOptions) error {
+	file, err := os.Create(name)
+	if nil != err {
+		return err
+	}
+	defer file.Close()
+
+	doc.Accept(NewSimplePrinter(file, options))
+	return nil
+}
+
 // DefaultVisitor 这个类的目的是简化编写定制扫描的visitor,使得我们不需要定制XMLVisitor的所有接口
 type DefaultVisitor struct {
 	EnterDocument func(XMLDocument) bool
@@ -1345,5 +1374,5 @@ func EscapeText(w io.Writer, s []byte) error {
 
 // Version 查询版本信息
 func Version() string {
-	return "1.1.0"
+	return "1.2.0"
 }
