@@ -148,7 +148,7 @@ tinydom提供了一系列的NewXXX方法用于创建各种不同类型的节点:
 
 - 将node添加为本节点的第一个子节点:`InsertFirstChild(node XMLNode) XMLNode`
 
-//- 将addThis添加到当前节点的前面:`InsertBack(addThis XMLNode) XMLNode`
+- 将addThis添加到当前节点的前面:`InsertBack(addThis XMLNode) XMLNode`
 
 - 删除本节点所有的子节点:`DeleteChildren()`
 
