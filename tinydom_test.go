@@ -868,3 +868,19 @@ func Test_inhert(t *testing.T) {
 	Call(c)
 	//Call(d)
 }
+
+func Test_Attr_Order(t *testing.T) {
+	s := `<node attr5="55"/>`
+	doc, _ := LoadDocument(bytes.NewBufferString(s))
+	node := doc.FirstChildElement("node")
+	node.SetAttribute("attr2", "22")
+	node.SetAttribute("attr3", "33")
+	node.SetAttribute("attr4", "44")
+	node.SetAttribute("attr6", "66")
+	node.SetAttribute("attr9", "99")
+	node.SetAttribute("attr", "")
+	buf := bytes.NewBufferString("")
+	doc.Accept(NewSimplePrinter(buf, PrintStream))
+	expect(t, "属性的顺序就是添加的顺序,不会应为key的不断变化而导致属性输出时,属性间的相对位置发生不断变化",
+	buf.String() == `<node attr5="55" attr2="22" attr3="33" attr4="44" attr6="66" attr9="99" attr=""/>`)
+}

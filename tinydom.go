@@ -7,6 +7,7 @@ import (
 	"errors"
 	"io"
 	"unicode/utf8"
+	"container/list"
 )
 
 // XMLAttribute 是一个元素的属性的接口.
@@ -513,7 +514,8 @@ type xmlElementImpl struct {
 	xmlNodeImpl
 
 	// rootAttribute XMLAttribute
-	attributes map[string]XMLAttribute
+	attrlist *list.List
+	attrsmap map[string]*list.Element
 }
 
 func (e *xmlElementImpl) ToElement() XMLElement {
@@ -542,63 +544,49 @@ func (e *xmlElementImpl) SetName(name string) {
 }
 
 func (e *xmlElementImpl) FindAttribute(name string) XMLAttribute {
-	if nil == e.attributes {
-		return nil
-	}
-
-	attr, ok := e.attributes[name]
+	elem, ok := e.attrsmap[name]
 	if !ok {
 		return nil
 	}
 
-	return attr
+	return elem.Value.(*xmlAttributeImpl)
 }
 
 func (e *xmlElementImpl) AttributeCount() int {
-	if nil == e.attributes {
-		return 0
-	}
-	return len(e.attributes)
+	return len(e.attrsmap)
 }
 
 func (e *xmlElementImpl) Attribute(name string, def string) string {
-	if nil == e.attributes {
-		return def
-	}
-
-	attr, ok := e.attributes[name]
+	attr, ok := e.attrsmap[name]
 	if !ok {
 		return def
 	}
 
-	return attr.Value()
+	return attr.Value.(*xmlAttributeImpl).Value()
 }
 
 func (e *xmlElementImpl) SetAttribute(name string, value string) XMLAttribute {
-	if nil == e.attributes {
-		e.attributes = make(map[string]XMLAttribute)
-		attr := newAttribute(name, value)
-		e.attributes[name] = attr
-		return attr
-	}
-
-	attr, ok := e.attributes[name]
+	elem, ok := e.attrsmap[name]
 	if ok {
-		attr.SetValue(value)
-		return attr
+		elem.Value.(*xmlAttributeImpl).SetValue(value)
+		return elem.Value.(*xmlAttributeImpl)
 	}
 
-	attr = newAttribute(name, value)
-	e.attributes[name] = attr
+	attr := newAttribute(name, value)
+	e.attrsmap[name] = e.attrlist.PushBack(attr)
 	return attr
 }
 
 func (e *xmlElementImpl) DeleteAttribute(name string) XMLAttribute {
-	attr := e.FindAttribute(name)
-	if nil == attr {
+	elem, ok := e.attrsmap[name]
+	if !ok {
 		return nil
 	}
-	delete(e.attributes, name)
+
+	attr := elem.Value.(*xmlAttributeImpl)
+
+	e.attrlist.Remove(elem)
+	delete(e.attrsmap, name)
 	return attr
 }
 
@@ -620,12 +608,8 @@ func (e *xmlElementImpl) SetText(inText string) {
 }
 
 func (e *xmlElementImpl) ForeachAttribute(callback func(attribute XMLAttribute) int) int {
-	if nil == e.attributes {
-		return 0
-	}
-
-	for _, value := range e.attributes {
-		if ret := callback(value); 0 != ret {
+	for elem := e.attrlist.Front(); nil != elem; elem = elem.Next() {
+		if ret := callback(elem.Value.(*xmlAttributeImpl)); 0 != ret {
 			return ret
 		}
 	}
@@ -634,7 +618,8 @@ func (e *xmlElementImpl) ForeachAttribute(callback func(attribute XMLAttribute) 
 }
 
 func (e *xmlElementImpl) ClearAttributes() {
-	e.attributes = nil
+	e.attrlist = list.New()
+	e.attrsmap = make(map[string]*list.Element)
 }
 
 // ------------------------------------------------------------------
@@ -762,7 +747,8 @@ func NewElement(name string) XMLElement {
 	node := new(xmlElementImpl)
 	node.implobj = node
 	node.value = name
-	node.attributes = make(map[string]XMLAttribute)
+	node.attrsmap = make(map[string]*list.Element)
+	node.attrlist = list.New()
 	return node
 }
 
@@ -785,7 +771,7 @@ func NewDirective(directive string) XMLDirective {
 
 // newAttribute 创建一个新的XMLAttribute对象.
 // name和value分别用于指定属性的名称和值
-func newAttribute(name string, value string) XMLAttribute {
+func newAttribute(name string, value string) *xmlAttributeImpl {
 	attr := new(xmlAttributeImpl)
 	attr.name = name
 	attr.value = value
