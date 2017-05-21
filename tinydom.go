@@ -505,9 +505,9 @@ func (n *xmlNodeImpl) DeleteChild(node XMLNode) {
 	n.unlink(node)
 }
 
-func (n *xmlNodeImpl) Accept(visitor XMLVisitor) bool {
-	return n.implobj.Accept(visitor)
-}
+//func (n *xmlNodeImpl) Accept(visitor XMLVisitor) bool {
+//	return n.implobj.Accept(visitor)
+//}
 
 // ------------------------------------------------------------------
 
