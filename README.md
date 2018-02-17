@@ -12,7 +12,7 @@ tinydom是一个非验证的，轻量级的，经过充分测试的go语言(gola
 # tinydom简介
 
 tidydom使用golang的encoding/xml标准库作为底层XML文本流的解析器。使用tinydom提供的接口可以实现简单的XML文件的读取和生成。
-tinydom借鉴了[tinyxml2(http://www.grinninglizard.com/tinyxml2/index.html)的接口设计技巧，提供了丰富的XML元素的查找手段。
+tinydom借鉴了[tinyxml2](http://www.grinninglizard.com/tinyxml2/index.html)的接口设计技巧，提供了丰富的XML元素的查找手段。
 
 
 
