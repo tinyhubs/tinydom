@@ -1108,7 +1108,7 @@ func (p *xmlSimplePrinter) VisitText(node XMLText) bool {
 	if node.CDATA() {
 		p.writer.Write([]byte("<![CDATA["))
 		p.writer.Write([]byte(node.Value()))
-		p.writer.Write([]byte("]]"))
+		p.writer.Write([]byte("]]>"))
 		return true
 	}
 
